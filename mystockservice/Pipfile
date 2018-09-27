@@ -17,6 +17,8 @@ lxml = "*"
 tushare = "*"
 matplotlib = "*"
 pyecharts = "*"
+scrapy = "*"
+quantaxis = "*"
 
 [dev-packages]
 pytest-aiohttp = "*"

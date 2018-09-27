@@ -1,0 +1,22 @@
+[[source]]
+url = "http://pypi.douban.com/simple/"
+verify_ssl = false
+name = "pypi"
+
+[packages]
+click = "*"
+pandas = "*"
+requests = "*"
+openpyxl = "*"
+lxml = "*"
+bs4 = "*"
+tushare = "*"
+scrapy = "*"
+quantaxis = "*"
+pytdx = "*"
+
+[requires]
+python_version = "3.6"
+
+[dev-packages]
+pylint = "*"

@@ -1,6 +1,3 @@
 {
-  "python.venvPath": "/u01/virtualenv/",
-  "python.pythonPath": "/Users/yihan/.local/share/virtualenvs/mystock-fsOA0AQ5/bin/python",
-  "python.linting.pylintEnabled": false,
-  "python.unitTest.pyTestEnabled": false
+    "python.pythonPath": "/home/yihan/.local/share/virtualenvs/mystock-AWb8L0l8/bin/python"
 }

@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "mystock"
+		},
+		{
+			"path": "mystockservice"
+		},
+		{
+			"path": "mystockdata"
+		}
+	],
+	"settings": {
+		"python.venvFolders": [
+			"envs",
+			".pyenv",
+			".direnv",
+		],
+		"python.venvPath": "/home/yihan/.local/share/virtualenvs/",
+		"python.pythonPath": "pipenv run python"
+	}
+}
