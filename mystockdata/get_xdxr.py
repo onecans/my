@@ -6,6 +6,7 @@ import pandas as pd
 import time
 
 ip = select_best_ip()
+ip = '180.153.18.170'
 # ip = '202.108.253.130'
 print(ip)
 def _select_market_code(code):
