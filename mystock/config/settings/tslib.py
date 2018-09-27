@@ -1,0 +1,2 @@
+TSLIB_CACHE_DIR = '/data/s'
+TSLIB_ONLY_CACHE = True

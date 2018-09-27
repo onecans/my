@@ -1,0 +1,24 @@
+{% extends "admin_base.html" %} {% block inner %}
+
+<div>
+    获取数字 (~[+-]{0,1}[0-9]{1,3}(,[0-9]{3})*) <br/> 获取项目 ([\u4e00-\u9fa5]+)~ <br/>
+
+    <pre>
+        <code>
+            import tabula
+            df2 = tabula.read_pdf('/Users/yihan/Desktop/601600_2017_z.pdf', pages='47-48,51,53',multiple_tables=False)
+
+            import re
+            s = '货币资金~~七、1~20,337,839~25,895,495'
+            re.findall(r'(~[0-9]{1,3}(,[0-9]{3})+)',s)
+            re.find('([\u4e00-\u9fa5]+)~',s)
+        </code>
+    </pre>
+
+</div>
+
+<form method='post'>
+    {% csrf_token %} {{form.as_p}}
+    <input name='import' , type="submit" />
+</form>
+{% endblock %}

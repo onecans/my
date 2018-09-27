@@ -1,0 +1,14 @@
+
+redis:
+  redis_url: "redis://:@localhost:6379/0"
+  minsize: 5
+  maxsize: 100
+
+cache:
+  host: "localhost"
+  port: 6379
+  db: 1
+  key_prefix: "cache__"
+  password:
+
+k_file_path: "/u01/data/export/"

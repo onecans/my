@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_modify suit_tags admin_urls %}
+{% load url from suit_compat %}
+
+{% block extrahead %}{{ block.super }}
+{% url 'admin:jsi18n' as jsi18nurl %}
+<script type="text/javascript" src="{{ jsi18nurl|default:" ../../../jsi18n/" }}"></script>
+
+{{ form.media }}
+
+
+{% endblock %}
+
+
+{% block extrastyle %}
+{{ block.super }}
+{% endblock %}
+
+{% block content_title_value %}
+{% trans 'Add' %} {{ opts.verbose_name }}
+{% endblock %}
+
+{% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
+
+{% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+
+
+{% block content %}
+
+<!--<div style="color:#F00">-->
+    <!--1. 目前不会操作数据库,可以随意使用 <br/>-->
+    <!--2. package 自带 Regi_Conc_Program 方法,可以生成EBS请求设置, 使用后可删除-->
+<!--</div>-->
+
+<!--<br/>-->
+<!--<br/>-->
+
+
+{% if form.errors %}
+<p style="color: red;">
+    Please correct the error{{ form.errors|pluralize }} below.
+</p>
+{% endif %}
+
+{% block inner %}
+
+{% endblock %}
+
+{% if msg %}
+  {{ msg|linebreaksbr }}
+{% endif %}
+
+
+{% endblock %}
+
+{# Empty centered sidebar as now we use sidebar in content block#}
+{% block sidebar_content %}{% endblock %}
