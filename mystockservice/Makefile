@@ -22,17 +22,10 @@ clean:
 	rm -rf dist
 
 run:
-<<<<<<< HEAD
 	pipenv run python -m lucky
 
 sync_k:
 	pipenv run python lucky/commands/sync_k_files.py
-=======
-	python -m lucky
-
-sync_k:
-	python lucky/commands/sync_k_files.py
->>>>>>> 7d6ee038d69902d770c53f6ce9f88eb6d520d458
 
 volume:
 	python lucky/commands/volume.py

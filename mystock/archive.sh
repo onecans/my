@@ -1,9 +1,4 @@
 cd ..
-<<<<<<< HEAD
-zip -x dump.rdb -r mystockservice.zip mystockservice
-zip -x mystock/staticfiles -r mystock.zip mystock
-
-=======
 rm -f mystockservice.zip
 rm -f mystock.zip
 zip -x mystockservice/dump.rdb -x \*.ipynb -r mystockservice.zip  mystockservice
@@ -24,4 +19,3 @@ for d in ('+1994','0913','+1995','0207','0522', '+1996','0119','1211','+1997','0
     date = datetime.datetime.strptime(s, '%Y%m%d')
     print(date)
     PeriodMinCnt(where='ALL', period_start=period_start,period_end=date).save()
->>>>>>> 7d6ee038d69902d770c53f6ce9f88eb6d520d458

@@ -19,11 +19,7 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
                     'end_market_size',
                     'end_profit',
                     'profit_without_new',
-<<<<<<< HEAD
                     'period_end', 'new_cnt','old_low_cnt'
-=======
-                    'period_end',
->>>>>>> 7d6ee038d69902d770c53f6ce9f88eb6d520d458
 
                     )
 

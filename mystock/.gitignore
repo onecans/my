@@ -306,8 +306,5 @@ pip-selfcheck.json
 mystock/media/
 
 
-<<<<<<< HEAD
-=======
 .vscode
 *.ipynb
->>>>>>> 7d6ee038d69902d770c53f6ce9f88eb6d520d458
