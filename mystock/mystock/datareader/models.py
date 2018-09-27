@@ -65,6 +65,7 @@ class PeriodMinCnt(models.Model):
     _end_profit.short_description = '包含新股比例（旧）'
     end_profit = property(_end_profit)
 
+<<<<<<< HEAD
     def _new_cnt(self):
         if self.end_market_size and self.start_market_size:
             return self.end_market_size - self.start_market_size
@@ -84,6 +85,9 @@ class PeriodMinCnt(models.Model):
     _old_low_cnt.short_description = '老股票破新低的数量'
 
     old_low_cnt = property(_old_low_cnt)
+=======
+    # end_profit.descritpon = 'x'
+>>>>>>> 7d6ee038d69902d770c53f6ce9f88eb6d520d458
 
     def get_url(self):
         return '/k/min_max_counter/{code}?resample={resample}&window_size={window_size}&col=low'
