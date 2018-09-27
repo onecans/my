@@ -1,0 +1,34 @@
+{% extends "admin_base.html" %} {% block inner %}
+
+
+<form method='post'>
+    {% csrf_token %}
+    <h1>{{ object }}</h1>
+    <input type="hidden" name="object_pk" value="{{object.pk}}">
+
+    <input type="hidden" name="zcfzb" value="http://quotes.money.163.com/service/zcfzb_{{object.pk}}.html">
+    <p><a href="http://quotes.money.163.com/f10/zcfzb_{{object.pk}}.html">资产负债表</a></p>
+
+    <input type="hidden" name="lrb" value="http://quotes.money.163.com/service/lrb_{{object.pk}}.html">
+    <p><a href="http://quotes.money.163.com/f10/lrb_{{object.pk}}.html">利润表</a></p>
+
+    <input type="hidden" name="xjllb" value="http://quotes.money.163.com/service/xjllb_{{object.pk}}.html">
+    <p><a href="http://quotes.money.163.com/f10/xjllb_{{object.pk}}.html">现金流量表</a></p>
+
+    {{form.as_p}}
+    
+    <input name='import' , type="submit", value='提交' />
+
+</form>
+
+{% for df in dfs %}
+<div>
+<h2>{{ df.title }}</h2>
+<div>
+{{ df.html|safe }}
+</div>
+</div>
+
+{%endfor%}
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "admin_base.html" %} {% block inner %}
+
+<div>
+  
+
+</div>
+
+<form method='post'>
+    {% csrf_token %} {{form.as_p}}
+    <input name='show' , type="submit" />
+</form>
+
+ 
+
+{% endblock %}

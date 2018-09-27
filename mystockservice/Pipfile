@@ -1,0 +1,31 @@
+[[source]]
+url = "http://pypi.douban.com/simple/"
+verify_ssl = false
+name = "pypi"
+
+[packages]
+aiohttp = "*"
+aioredis = "*"
+pyyaml = "*"
+click = "*"
+pandas = "*"
+requests = "*"
+gunicorn = "*"
+openpyxl = "*"
+lxml = "*"
+"bs4" = "*"
+tushare = "*"
+matplotlib = "*"
+pyecharts = "*"
+
+[dev-packages]
+pytest-aiohttp = "*"
+pylint = "*"
+aiohttp-devtools = "*"
+"autopep8" = "*"
+"flake8" = "*"
+pycodestyle = "<2.4.0"
+rope = "*"
+
+[requires]
+python_version = "3.6"

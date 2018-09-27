@@ -1,0 +1,21 @@
+{% extends "admin_base.html" %} {% block inner %}
+
+<div>
+<pre>
+    为何借，借多久，向谁借，利息多少
+
+</pre>
+
+</div>
+
+{% for df in dfs %}
+<div>
+<h2>{{ df.title }}</h2>
+<div>
+{{ df.html|safe }}
+</div>
+</div>
+
+{%endfor%}
+
+{% endblock %}
