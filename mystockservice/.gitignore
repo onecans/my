@@ -15,4 +15,4 @@ site/
 .env
 db.sqlite3
 .coveralls.yml
-dump.rdb
+*.rdb

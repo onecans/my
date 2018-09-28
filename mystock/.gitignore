@@ -308,3 +308,6 @@ mystock/media/
 
 .vscode
 *.ipynb
+*.xlsx
+
+*.rdb
