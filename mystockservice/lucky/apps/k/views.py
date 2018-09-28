@@ -13,43 +13,21 @@ import pandas as pd
 from aiohttp import web
 
 from aiohttp_cache import cache
+from lucky.base.parameter import (Parameters, build_parameters,
+                                  fetch_parameters, parameter_to_dict)
+from lucky.base.response import json_response
 
 from . import services
 from .query import Line, LineDf
-from .utils import (Parameters, build_parameters, chunk, fetch_parameters,
-                    parameter_to_dict)
+from .utils import chunk
 
 routes = web.RouteTableDef()
-
 
 # @routes.get('/k/_load/{key}', name='getk')
 # async def get_k(request):
 #     key = request.match_info['key']
 #     x = await loads(request.app, key)
 #     return web.Response(body=x, content_type='application/json')
-
-def json_response(data=web.helpers.sentinel, *, paras=None, text=None, body=None, status=200,
-                  reason=None, headers=None, content_type='application/json',
-                  dumps=json.dumps):
-    if data is not web.helpers.sentinel:
-        if text or body:
-            raise ValueError(
-                "only one of data, text, or body should be specified"
-            )
-        else:
-            rst = {}
-            if paras is not None:
-                if isinstance(paras, Parameters):
-                    rst['paras'] = parameter_to_dict(paras)
-                else:
-                    rst['paras'] = paras
-
-            rst['datetime'] = datetime.datetime.isoformat(
-                datetime.datetime.now())
-            rst['result'] = data
-            text = dumps(rst)
-    return web.Response(text=text.replace(' NaN', ' null'), body=body, status=status, reason=reason,
-                        headers=headers, content_type=content_type)
 
 
 @routes.post('/upload/{file_name}', name='postfile')

@@ -14,11 +14,12 @@ import pandas as pd
 from aiohttp import web
 
 from aiohttp_cache import cache
+from lucky.base.parameter import build_parameters, fetch_parameters
 
 from . import backends, services
 from .backends import *
 from .backends import code_list as _code_list
-from .utils import build_parameters, chunk, fetch_parameters
+from .utils import chunk
 
 
 async def code_list(app, where):

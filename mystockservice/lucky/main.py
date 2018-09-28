@@ -11,7 +11,6 @@ sys.path.insert(0, str(PROJ_ROOT.absolute()))
 
 try:
     from lucky.redis import close_redis, init_redis
-    from lucky.routes import setup_routes
     from lucky.utils import load_config
 
     from lucky.cache import init_cache

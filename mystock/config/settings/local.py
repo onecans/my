@@ -58,7 +58,7 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TEMPLATE_CONTEXT': True,
 }
 
-ALLOWED_HOSTS = ['192.168.2.108',]
+ALLOWED_HOSTS = ['192.168.2.108','127.0.0.1']
 
 # django-extensions
 # ------------------------------------------------------------------------------

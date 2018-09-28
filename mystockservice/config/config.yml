@@ -12,3 +12,4 @@ cache:
   password:
 
 k_file_path: "/u01/data/export/"
+xdxr_file_path: "/u01/my/mystockdata/xdxr/"
