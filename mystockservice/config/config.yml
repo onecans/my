@@ -11,4 +11,4 @@ cache:
   key_prefix: "cache__"
   password:
 
-k_file_path: "/Users/yihan/Desktop/export/"
+k_file_path: "/u01/data/export/"

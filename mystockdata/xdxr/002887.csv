@@ -1,0 +1,5 @@
+date,category,name,fenhong,peigujia,songzhuangu,peigu,suogu,liquidity_before,liquidity_after,shares_before,shares_after,fenshu,xingquanjia,date,category_meaning,code
+2017-08-01,5,股本变化,,,,,,0.0,2000.0,0.0,8000.0,,,2017-08-01,股本变化,002887
+2018-06-19,1,除权除息,6.0,0.0,10.0,0.0,,,,,,,,2018-06-19,除权除息,002887
+2018-06-19,9,转配股上市,,,,,,2000.0,4000.0,8000.0,16000.0,,,2018-06-19,转配股上市,002887
+2018-08-01,5,股本变化,,,,,,4000.0,5133.91015625,16000.0,16000.0,,,2018-08-01,股本变化,002887
