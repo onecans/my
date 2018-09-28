@@ -1,3 +1,5 @@
+import pprint
+
 import pandas as pd
 
 
@@ -6,8 +8,9 @@ def post_xdxr(app, file_name):
     f = p + file_name
 
     df = pd.read_csv(f)
+    df.index = pd.DatetimeIndex(df.date)
 
-    print(df)
+    pprint.pprint(df.to_dict('index'))
 
 
 if __name__ == '__main__':
