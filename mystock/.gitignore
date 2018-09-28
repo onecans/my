@@ -311,3 +311,5 @@ mystock/media/
 *.xlsx
 
 *.rdb
+
+*.sqlite
