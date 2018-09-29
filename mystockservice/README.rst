@@ -55,15 +55,16 @@ Usage:
     http://127.0.0.1:9001/k/baseinfo/601600?col=totals,pe
     http://127.0.0.1:9001/k/codes/SH
     http://127.0.0.1:9001/k/line/2018-01-01/2018-05-01/601600
-    http://127.0.0.1:9001/k/combin/2018-01-01/2018-05-01/601600?line&volume&describe&baseinfo
-    http://127.0.0.1:9001/k/line/2018-01-01/2018-09-01/INDEX_000001?where=INDEX&nocache
-    http://127.0.0.1:9001/k/line/2018-01-01/2018-09-01/INDEX_000001?where=INDEX&nocache
-    http://127.0.0.1:9001/k/line/2018-01-01/2018-09-01/INDEX_000001?where=INDEX&nocache
-    http://127.0.0.1:9001/k/line/2018-01-01/2018-09-01/INDEX_399001?where=INDEX
+    http://127.0.0.1:9001/k/combin/2018-01-01/2018-05-01/601600?line&volume&describe&baseinfo 
+    http://127.0.0.1:9001/k/line/2018-01-01/2018-09-01/399001
 
+    http://127.0.0.1:9001/k/line/2007-01-01/2018-05-01/601600?nocache&col=shares
+    http://127.0.0.1:9001/k/marketsize
 
     http://127.0.0.1:9001/k/min/2018-01-01/2018-09-01/601600?k=57
         - 相应期间内，近 k 天是否破新低
 
     http://127.0.0.1:9001/k/min_max_counter/start/end/601600?resample=2w&window_size=365
         - 获取整个上市区间内，按照 resample 之后，破新高，破新低的股票， 破近期（window_size) 新高新低的股票数
+
+    http://127.0.0.1:9001/k/line2/2018-01-01/2018-05-01/601600?col=shares,high&nocache

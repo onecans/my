@@ -4,6 +4,7 @@ import json
 import math
 import os
 import time
+import pathlib
 from collections import Counter, defaultdict, namedtuple
 from concurrent.futures import ProcessPoolExecutor
 from json import JSONEncoder
@@ -17,13 +18,11 @@ from aiohttp_cache import cache
 from lucky.base.parameter import build_parameters, fetch_parameters
 
 from . import backends, services
-from .backends import *
-from .backends import code_list as _code_list
-from .utils import chunk
+ 
+from .utils import chunk, parse_file_name
 
 
-async def code_list(app, where):
-    return await _code_list(app, where)
+code_list = backends.code_list
 
 
 def _desc(df, col):
@@ -71,7 +70,7 @@ def _filter_df(df, paras):
 
 async def _to_df(paras):
     codes = paras.code.split(',')
-    df = await loads_keys(paras.app, [paras.col, ], codes=codes, where=paras.where, to_df=True)
+    df = await backends.loads_keys(paras.app, [paras.col, ], codes=codes, where=paras.where, to_df=True)
     tmp = {}
     if not df.empty:
         df = _filter_df(df, paras)
@@ -81,7 +80,7 @@ async def _to_df(paras):
 
 async def describe(paras):
     codes = [paras.code, ]
-    df = await loads_keys(paras.app, [paras.col, ], codes=codes, where='ALL', to_df=True)
+    df = await backends.loads_keys(paras.app, [paras.col, ], codes=codes, where='ALL', to_df=True)
     tmp = {}
     if not df.empty:
         df = _filter_df(df, paras)
@@ -96,7 +95,7 @@ async def describe_all(paras):
     loop = asyncio.get_event_loop()
     executor = ProcessPoolExecutor(max_workers=8)
     if paras.code == 'ALL':
-        codes = await code_list(paras.app, paras.where)
+        codes = await backends.code_list(paras.app, paras.where)
     else:
         codes = paras.code.split(',')
     records = []
@@ -133,20 +132,61 @@ async def describe_all(paras):
 async def post_file(app, file_name, index=False, columns=['date', 'open', 'high',
                                                           'low', 'close', 'volume', 'amount']):
     k_file_path = app['config']['k_file_path']
-
+    bfq_k_file_path = app['config']['bfq_k_file_path']
+    xdxr_file_path = app['config']['xdxr_file_path']
+    
     tmp = pd.read_csv(os.path.join(k_file_path, file_name), skiprows=1, engine='python',
                       encoding='gbk', sep='\t', skipfooter=1)
     if index:
         tmp.drop(tmp.columns[6:], axis=1, inplace=True)
         tmp[6] = 0
-
-    if columns:
-        tmp.columns = columns
+    if not columns:
+        raise web.HTTPInternalServerError()
+    tmp.columns = columns
     if 'date' in tmp.columns:
         tmp.index = pd.DatetimeIndex(tmp['date'])
         del tmp['date']
+    dates = pd.date_range(min(tmp.index),max(tmp.index))
+    # 处理bfq
+    if not index:
+        bfq = pd.read_csv(os.path.join(bfq_k_file_path, file_name), skiprows=1, engine='python', encoding='gbk', sep='\t', skipfooter=1)
+        bfq.columns = ['bfq_' + c for c in columns]
+        if 'bfq_date' in bfq.columns:
+            bfq.index = pd.DatetimeIndex(bfq['bfq_date'])
+            del bfq['bfq_date']
+            del bfq['bfq_volume']
+            del bfq['bfq_amount']
+    
+        tmp = pd.concat([tmp, bfq], axis=1, join='inner').reindex(dates, method='ffill')
+        
+    
+    # 处理xdxr
+    _,code= parse_file_name(file_name)
+    xdxr_file_path = xdxr_file_path + code + '.csv'
+    # print(xdxr_file_path)
+    if pathlib.Path(xdxr_file_path).exists():
+        
+        xdxr = pd.read_csv(xdxr_file_path)
+        xdxr.index = pd.DatetimeIndex(xdxr.date)
 
-    rst = await dumps(app, tmp, file_name)
+        df1 = xdxr[['shares_before']].dropna().reindex(dates, method='bfill')
+        df2 = xdxr[['shares_after']].dropna().reindex(dates, method='ffill')
+        df3 = xdxr[['liquidity_before']].dropna().reindex(dates, method='bfill')
+        df4 = xdxr[['liquidity_after']].dropna().reindex(dates, method='ffill')
+        xdxr = pd.concat([df1,df2, df3,df4],axis=1).fillna(0)
+
+        xdxr['shares'] = xdxr[['shares_before','shares_after']].apply(max,axis=1)
+        xdxr['liquidity'] = xdxr[['liquidity_before','liquidity_after']].apply(max,axis=1)
+
+        xdxr = xdxr[['shares','liquidity']]
+
+        tmp = pd.concat([tmp,xdxr],axis=1)
+        tmp = tmp.sort_index()
+    else:
+        print(code, 'not found xdxr')
+    # print(tmp)
+    # print(tmp)
+    rst = await backends.dumps(app, tmp, file_name)
     return rst
 
 
@@ -277,7 +317,7 @@ async def k_marketsize(paras):
     df = df[df['timeToMarket'] > 1990]
 
     if 'where' in paras.query:
-        codes = await code_list(paras.app, paras.query['where'])
+        codes = await backends.code_list(paras.app, paras.query['where'])
         df = df[df.index.isin(codes)]
     df['timeToMarket'] = df['timeToMarket'].apply(str)
     df['cnt'] = 1

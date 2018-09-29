@@ -79,12 +79,13 @@ async def _line(paras):
 
 class Line:
     @valid({'where': ['SH', 'SZ', 'INDEX', 'ALL']})
-    def __init__(self, *, code, where='ALL', col='high', start='start', end='end', app=None):
+    def __init__(self, *, code, where='ALL', col='high', start='start', end='end', app=None, nocache=False):
         self.code = code
         self.where = where
         self.start = 'start'
         self.end = 'end'
         self.cols = None
+        self.nocache= nocache
 
         self.date_range(start, end)
         if col:
@@ -123,7 +124,7 @@ class Line:
             raise ValueError('col can not be None')
 
         codes = [self.code, ]
-        # print(codes, self.where, self.cols, self.start, self.end)
+        print('xxx',codes, self.where, self.cols, self.start, self.end)
         df = await backends.loads_keys(self.app, self.cols, codes=codes, where=self.where, to_df=True)
         df = df.sort_index()
         df = df.reindex(pd.date_range(
@@ -142,13 +143,18 @@ class Line:
         return '%s~%s~%s' % (self.code, ','.join(sorted(self.cols)), self.where)
 
     async def to_df(self, app=None, expires=60 * 60 * 12):
+
         if app:
             self.app = app
         cache_backend = self.app["cache"]
         key = self.build_key()
-        cached_rst = await cache_backend.get(key)
-        if cached_rst is not None:
-            df = cached_rst
+        if not self.nocache:
+            cached_rst = await cache_backend.get(key)
+            if cached_rst is not None:
+                df = cached_rst
+            else:
+                df = await self._to_df()
+                await cache_backend.set(key, df, expires)
         else:
             df = await self._to_df()
             await cache_backend.set(key, df, expires)
@@ -226,6 +232,7 @@ class LineDf:
         print(start1, end1, start2, end2)
         # 最高点到最低点
         rst = {}
+        # print(self.df)
         if self.df is not None and not self.df.empty:
             start_df = self.df[self.df.index >= start1].copy()
             start_df = start_df[start_df.index <= end1]
@@ -240,6 +247,16 @@ class LineDf:
 
             end_high_idx = end_df['high'].idxmax()
             end_low_idx = end_df['low'].idxmin()
+
+            # print(start_high_idx)
+            # print(start_low_idx)
+            # print(end_high_idx)
+            # print(end_low_idx)
+
+            # print(start_df['high'])
+            # print(start_df['low'])
+            # print(end_df['high'])
+            # print(end_df['low'])
 
             start_high, start_low, end_high, end_low = (start_df['high'].loc[start_high_idx],
                                                         start_df['low'].loc[start_low_idx],

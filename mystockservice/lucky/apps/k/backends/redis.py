@@ -32,6 +32,7 @@ async def series_to_redis(redis, key, series, as_df=True):
 
 
 async def redis_to_series(redis, key, to_df=True):
+
     if to_df:
         return pickle.loads(zlib.decompress(await redis.get(key)))
     else:

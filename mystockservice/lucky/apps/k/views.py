@@ -201,16 +201,21 @@ async def k_marketsize(request):
 
 
 def _def_paras(request):
+    if 'nocache' in request.query:
+        nocache = True
+    else:
+        nocache = False
     return (request.match_info.get('code', None),
             request.match_info.get(
                 'start', None), request.match_info.get('end', None),
-            request.query.get('col', None)
+            request.query.get('col', None),
+            nocache
             )
 
 
 def _build_line(request):
-    code, start, end, col = _def_paras(request)
-    line = Line(code=code, app=request.app, start=start, end=end, col=col)
+    code, start, end, col, nocache = _def_paras(request)
+    line = Line(code=code, app=request.app, start=start, end=end, col=col, nocache=nocache)
     return line
 
 

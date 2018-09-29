@@ -22,7 +22,7 @@ clean:
 	rm -rf dist
 
 run:
-	pipenv run python -m lucky
+	sh run.sh 1>> /u01/logs/mystockservice.log 2>>  /u01/logs/mystockservice.err
 
 sync_k:
 	pipenv run python lucky/commands/sync_k_files.py
