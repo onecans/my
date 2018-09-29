@@ -3,8 +3,8 @@ import datetime
 import json
 import math
 import os
-import time
 import pathlib
+import time
 from collections import Counter, defaultdict, namedtuple
 from concurrent.futures import ProcessPoolExecutor
 from json import JSONEncoder
@@ -18,9 +18,7 @@ from aiohttp_cache import cache
 from lucky.base.parameter import build_parameters, fetch_parameters
 
 from . import backends, services
- 
 from .utils import chunk, parse_file_name
-
 
 code_list = backends.code_list
 
@@ -148,7 +146,8 @@ async def post_file(app, file_name, index=False, columns=['date', 'open', 'high'
         del tmp['date']
     dates = pd.date_range(min(tmp.index),max(tmp.index))
     # 处理bfq
-    if not index:
+    if not index and pathlib.Path(os.path.join(bfq_k_file_path, file_name)).exists():
+        
         bfq = pd.read_csv(os.path.join(bfq_k_file_path, file_name), skiprows=1, engine='python', encoding='gbk', sep='\t', skipfooter=1)
         bfq.columns = ['bfq_' + c for c in columns]
         if 'bfq_date' in bfq.columns:
@@ -169,17 +168,39 @@ async def post_file(app, file_name, index=False, columns=['date', 'open', 'high'
         xdxr = pd.read_csv(xdxr_file_path)
         xdxr.index = pd.DatetimeIndex(xdxr.date)
 
-        df1 = xdxr[['shares_before']].dropna().reindex(dates, method='bfill')
-        df2 = xdxr[['shares_after']].dropna().reindex(dates, method='ffill')
-        df3 = xdxr[['liquidity_before']].dropna().reindex(dates, method='bfill')
-        df4 = xdxr[['liquidity_after']].dropna().reindex(dates, method='ffill')
+        xdxr = xdxr[xdxr['category'] != 6] # 去除 6-增发新股
+
+        df1 = xdxr[['shares_before']].dropna()
+        df2 = xdxr[['shares_after']].dropna()
+        df3 = xdxr[['liquidity_before']].dropna()
+        df4 = xdxr[['liquidity_after']].dropna()
+
+        if sum(df1.index.duplicated(keep=False)):
+            df1 = df1.groupby(df1.index).min()
+
+        if sum(df2.index.duplicated(keep=False)):
+            df2 = df2.groupby(df2.index).max()
+
+        if sum(df3.index.duplicated(keep=False)):
+            df3 = df3.groupby(df3.index).min()
+
+        if sum(df4.index.duplicated(keep=False)):
+            df4 = df4.groupby(df4.index).max()
+
+        # print(df4)
+        df1 = df1.reindex(dates, method='bfill')
+        df2 = df2.reindex(dates, method='ffill')
+        df3 = df3.reindex(dates, method='bfill')
+        df4 = df4.reindex(dates, method='ffill')
+
+
         xdxr = pd.concat([df1,df2, df3,df4],axis=1).fillna(0)
 
         xdxr['shares'] = xdxr[['shares_before','shares_after']].apply(max,axis=1)
         xdxr['liquidity'] = xdxr[['liquidity_before','liquidity_after']].apply(max,axis=1)
 
         xdxr = xdxr[['shares','liquidity']]
-
+        
         tmp = pd.concat([tmp,xdxr],axis=1)
         tmp = tmp.sort_index()
     else:

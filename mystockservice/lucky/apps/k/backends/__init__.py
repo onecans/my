@@ -1,17 +1,18 @@
-from . import redis
+from . import leveldb_redis as backend
 
 
 async def dumps(app, df, key):
     r = app['redis']
-    keys = await redis.dumps(df, key, r)
+    db = app['leveldb']
+    keys = await backend.dumps(df, key, db, r)
     return {'backend': 'redis', 'keys': keys}
 
 
 async def loads_keys(app,  columns,  where=None, codes=None, to_df=False):
     r = app['redis']
-
+    db = app['leveldb']
     if to_df:
-        rst = await redis.loads_keys_as_df(r, columns, where, codes)
+        rst = await backend.loads_keys_as_df(db, r, columns, where, codes)
         return rst
     else:
         raise NotImplementedError
@@ -19,9 +20,11 @@ async def loads_keys(app,  columns,  where=None, codes=None, to_df=False):
 
 async def code_list(app, where):
     r = app['redis']
-    return await redis.code_list(where, r)
+    db = app['leveldb']
+    return await backend.code_list(where, r)
 
 
 async def loads_base_info(app, columns):
     r = app['redis']
-    return await redis.loads_base_info(r, columns)
+    db = app['leveldb']
+    return await backend.loads_base_info(db, columns)

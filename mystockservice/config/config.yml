@@ -1,4 +1,5 @@
-
+leveldb:
+  name: '/u01/my/mystockdata/leveldb/'
 redis:
   redis_url: "redis://:@localhost:6379/0"
   minsize: 5

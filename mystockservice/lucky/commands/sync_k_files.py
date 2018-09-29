@@ -22,7 +22,7 @@ def load_config(fname):
 def sync_file():
     config = load_config(PROJ_ROOT / 'config' / 'config.yml')
     for root, dirs, files in os.walk(config['k_file_path']):
-        with futures.ThreadPoolExecutor(max_workers=50) as pool:
+        with futures.ThreadPoolExecutor(max_workers=10) as pool:
             rst = []
             i = 0
             for file in files:
@@ -50,7 +50,7 @@ def sync_file():
 
 
 def sync_base():
-    base = ts.get_stock_basics()
+    # base = ts.get_stock_basics()
     r = requests.post(URL + 'baseinfo')
     print(r.text)
 

@@ -19,6 +19,7 @@ matplotlib = "*"
 pyecharts = "*"
 scrapy = "*"
 quantaxis = "*"
+plyvel = "*"
 
 [dev-packages]
 pytest-aiohttp = "*"

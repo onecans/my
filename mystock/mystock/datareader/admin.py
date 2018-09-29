@@ -25,7 +25,7 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
 
     list_filter = ('where',)
     search_fields = ('period_start',)
-    actions = ['fetch', 'compare_codes']
+    actions = ['fetch', 'compare_codes','copy']
     actions_on_top = True
     list_per_page = 1000
 
@@ -43,6 +43,10 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
                                            '2016-01-27', '2001-06-14', '2014-07-21', '2007-10-16', '1999-06-30', '1997-05-12', '1994-09-13', '1999-05-18', '2005-06-03',
                                            '1993-02-16', '2004-04-09', '2009-08-06', '2001-06-14', '2018-01-29', '1994-08-01', '1996-01-19', '2005-07-11',
                                            '2015-06-15', '1992-05-26', '1992-11-17', '2005-07-19', '2008-11-04', '2009-08-05', '1994-7-29')).order_by('period_start', 'period_end')
+
+    def copy(self, request, qs):
+        for obj in qs:
+            PeriodMinCnt(where=obj.where, period_start=obj.period_start, period_end=obj.period_end).save()
 
     def get_period(self, obj):
         s, e = obj.period

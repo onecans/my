@@ -37,6 +37,13 @@ async def post_file(request):
     return json_response(rst)
 
 
+@routes.get('/upload/{file_name}', name='postfile')
+async def post_file2(request):
+    file_name = request.match_info['file_name']
+    rst = await services.post_file(request.app, file_name)
+    return json_response(rst)
+
+
 @routes.post('/uploadidx/{file_name}', name='postindexfile')
 async def post_index_file(request):
     file_name = request.match_info['file_name']
@@ -49,7 +56,6 @@ async def post_other_file(request):
     file_name = request.match_info['file_name']
     rst = await services.post_file(request.app, file_name, columns=None)
     return json_response(rst)
-
 
 @routes.post('/baseinfo')
 async def post_base_info(request):
@@ -215,7 +221,8 @@ def _def_paras(request):
 
 def _build_line(request):
     code, start, end, col, nocache = _def_paras(request)
-    line = Line(code=code, app=request.app, start=start, end=end, col=col, nocache=nocache)
+    line = Line(code=code, app=request.app, start=start,
+                end=end, col=col, nocache=nocache)
     return line
 
 
