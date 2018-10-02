@@ -1,14 +1,16 @@
-from pytdx.util.best_ip import select_best_ip
-
-from pytdx.hq import TdxHq_API
-
-import pandas as pd
+import pathlib
 import time
 
+import pandas as pd
+from pytdx.hq import TdxHq_API
+from pytdx.util.best_ip import select_best_ip
+
 ip = select_best_ip()
-ip = '180.153.18.170'
+# ip = '180.153.18.170'
 # ip = '202.108.253.130'
-print(ip)
+# print(ip)
+
+
 def _select_market_code(code):
     """
     1- sh
@@ -19,14 +21,16 @@ def _select_market_code(code):
         return 1
     return 0
 
+
 def _codes():
-    
+
     api = TdxHq_API()
-    
+
     with api.connect(ip):
-        rst=api.get_security_list(0,255)
+        rst = api.get_security_list(0, 255)
 
     return rst
+
 
 def QA_fetch_get_stock_xdxr(code):
     '除权除息'
@@ -56,7 +60,6 @@ def QA_fetch_get_stock_xdxr(code):
 
         e = time.time()
 
-    
     print('using time', e-s)
 
 
@@ -103,8 +106,9 @@ def for_sh(code):
     else:
         return 'undefined'
 
+
 def QA_fetch_get_stock_list(type_='stock'):
-    
+
     api = TdxHq_API()
     with api.connect(ip):
         data = pd.concat([pd.concat([api.to_df(api.get_security_list(j, i * 1000)).assign(sse='sz' if j == 0 else 'sh').set_index(
@@ -141,18 +145,13 @@ def QA_fetch_get_stock_list(type_='stock'):
 # print(df.columns)
 
 
-
-import pathlib
-df= QA_fetch_get_stock_list()
+df = QA_fetch_get_stock_list()
 for code in df['code']:
     print(code)
     if pathlib.Path('./xdxr/%s.csv' % code).exists():
         print('pass')
         continue
-    
-    df =QA_fetch_get_stock_xdxr(code)
+
+    df = QA_fetch_get_stock_xdxr(code)
     if df is not None:
         df.to_csv('./xdxr/%s.csv' % code)
-    
-
-
