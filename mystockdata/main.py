@@ -74,9 +74,9 @@ def k_sync(code, force):
 
 @sync.command()
 def sync_all():
-    _code_base_sync()
-    _se_sync()
-    _xdxr_sync(code=None, from_tdx=None)
+    # _code_base_sync()
+    # _se_sync()
+    # _xdxr_sync(code=None, from_tdx=None)
     _k_sync(code=None, force=True)
 
 

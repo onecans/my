@@ -60,8 +60,14 @@ def sync_code(code, force=False):
             del bfq['bfq_date']
             del bfq['bfq_volume']
             del bfq['bfq_amount']
-
-        tmp = pd.concat([tmp, bfq], axis=1, join='inner').reindex(
+        if sum(tmp.index.duplicated(keep=False)):
+            tmp = tmp.groupby(tmp.index).min()
+        if sum(bfq.index.duplicated(keep=False)):
+            bfq = bfq.groupby(bfq.index).min()
+        tmp = tmp.reindex(
             dates, method='ffill')
+        bfq = bfq.reindex(dates,method='ffill')
+
+        tmp = pd.concat([tmp, bfq], axis=1, join='inner')
 
     codedb.save(tmp)
