@@ -1,9 +1,9 @@
+from collections import Counter
 from functools import wraps
 
 import pandas as pd
 
-from . import backends
-from .backends import *
+from lucky.apps import backends
 
 
 def valid(d):
@@ -85,7 +85,7 @@ class Line:
         self.start = 'start'
         self.end = 'end'
         self.cols = None
-        self.nocache= nocache
+        self.nocache = nocache
 
         self.date_range(start, end)
         if col:
@@ -97,8 +97,6 @@ class Line:
         self.end = end
         return self
 
-    # @valid({'col': ['open', 'high',
-    #                 'low', 'close', 'volume', 'amount']})
     def col(self, col):
         print(col)
         self.cols = col.split(',')
@@ -123,53 +121,21 @@ class Line:
         if self.col is None:
             raise ValueError('col can not be None')
 
-        codes = [self.code, ]
-        print('xxx',codes, self.where, self.cols, self.start, self.end)
-        df = await backends.loads_keys(self.app, self.cols, codes=codes, where=self.where, to_df=True)
-        df = df.sort_index()
-        df = df.reindex(pd.date_range(
-            df.index[0], df.index[-1]), method='nearest')
-        if 'code' in df.columns:
-            del df['code']
-        # print(df)
-
-        # start = df.index[0] if self.start == 'start' else self.start
-
-        # end = df.index[-1] if self.end == 'end' else self.end
+        df = await backends.code_info(self.app, columns=self.cols, code=self.code)
 
         return df
 
-    def build_key(self):
-        return '%s~%s~%s' % (self.code, ','.join(sorted(self.cols)), self.where)
-
-    async def to_df(self, app=None, expires=60 * 60 * 12):
-
+    async def to_df(self, app=None):
         if app:
             self.app = app
-        cache_backend = self.app["cache"]
-        key = self.build_key()
-        if not self.nocache:
-            cached_rst = await cache_backend.get(key)
-            if cached_rst is not None:
-                df = cached_rst
-            else:
-                df = await self._to_df()
-                await cache_backend.set(key, df, expires)
-        else:
-            df = await self._to_df()
-            await cache_backend.set(key, df, expires)
+
+        df = await self._to_df()
         if not df.empty:
             if self.start and self.start != 'start':
                 df = df[df.index >= self.start]
             if self.end and self.end != 'end':
                 df = df[df.index <= self.end]
-        # start = df.index[0] if self.start == 'start' else self.start
-        # end = df.index[-1] if self.end == 'end' else self.end
-        # if start < df.index[0].strftime('%Y-%m-%d') or end > df.index[-1].strftime('%Y-%m-%d'):
-        #     df = df.reindex(pd.date_range(
-        #         start, end), method='nearest')
 
-        # print('rst', df)
         return LineDf(df)
 
 
@@ -216,6 +182,66 @@ class LineDf:
         else:
             return False
 
+    @mandatory_cols(['high'])
+    def max_count(self, window_size=30 * 52, resample=None):
+        '''
+        排查每一天，确认是否破新高
+        '''
+        col = 'high'
+        self.df = self.df\
+            .assign(cummax=self.df[col].cummax())
+        self.df = self.df\
+            .assign(ismax=self.df[col] == self.df['cummax'])\
+            .assign(rolling_max=self.df[col].rolling(window_size).max())
+
+        self.df = self.df\
+            .assign(is_rolling_max=self.df[col] == self.df['rolling_max'])\
+
+        counters = {}
+        for _col in ['is_rolling_max', 'ismax']:
+            tmp = self.df[[_col]]
+            if resample:
+                tmp = tmp.resample(resample).sum()
+                tmp = tmp > 0
+
+            tmp = tmp[tmp.sum(axis=1) > 0]
+            tmp.index = tmp.index.strftime('%Y-%m-%d')
+            c = Counter()
+            c.update(**tmp.to_dict()[_col])
+            counters[_col] = c
+
+        return counters
+
+    @mandatory_cols(['low'])
+    def min_count(self, window_size=30 * 52, resample=None):
+        '''
+        排查每一天，确认是否破新低
+        '''
+        col = 'low'
+        self.df = self.df\
+            .assign(cummin=self.df[col].cummin())
+        self.df = self.df\
+            .assign(ismin=self.df[col] == self.df['cummin'])\
+            .assign(rolling_min=self.df[col].rolling(window_size).min())
+
+        self.df = self.df\
+            .assign(is_rolling_min=self.df[col] == self.df['rolling_min'])
+
+        counters = {}
+        for _col in ['is_rolling_min', 'ismin', ]:
+            tmp = self.df[[_col]]
+            if resample:
+                tmp = tmp.resample(resample).sum()
+                tmp = tmp > 0
+
+            tmp = tmp[tmp.sum(axis=1) > 0]
+            tmp.index = tmp.index.strftime('%Y-%m-%d')
+            c = Counter()
+            c.update(**tmp.to_dict()[_col])
+            counters[_col] = c
+
+        return counters
+
     def to_dict(self, inplace=False):
         if inplace:
             tmp = self.df
@@ -247,16 +273,6 @@ class LineDf:
 
             end_high_idx = end_df['high'].idxmax()
             end_low_idx = end_df['low'].idxmin()
-
-            # print(start_high_idx)
-            # print(start_low_idx)
-            # print(end_high_idx)
-            # print(end_low_idx)
-
-            # print(start_df['high'])
-            # print(start_df['low'])
-            # print(end_df['high'])
-            # print(end_df['low'])
 
             start_high, start_low, end_high, end_low = (start_df['high'].loc[start_high_idx],
                                                         start_df['low'].loc[start_low_idx],

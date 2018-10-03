@@ -39,7 +39,7 @@ def line(code, start, end, col, is_index):
 def baseinfo(code, col):
     stock_server = get_server()
     query = {}
-    url = f'{stock_server}/k/baseinfo/{code}'
+    url = f'{stock_server}/baseinfo/{code}'
     query['col'] = col
     tmp = requests.get(url, params=query).json()['result']
     rst = {}
@@ -71,14 +71,14 @@ class AioHttpFetch():
         # return ['601600']
         async with aiohttp.ClientSession() as session:
             if min_timetomarket:
-                codes = await self.do_fetch(session, f'{self.stock_server}/k/codes/{where}?start_timetomarket={min_timetomarket}')
+                codes = await self.do_fetch(session, f'{self.stock_server}/se/codelist/{where}?start_timetomarket={min_timetomarket}')
             else:
-                codes = await self.do_fetch(session, f'{self.stock_server}/k/codes/{where}')
+                codes = await self.do_fetch(session, f'{self.stock_server}/se/codelist/{where}')
             return codes['result']
 
     async def get_marketsize(self, where="ALL",):
         async with aiohttp.ClientSession() as session:
-            marketsize = await self.do_fetch(session, f'{self.stock_server}/k/marketsize?where={where}')
+            marketsize = await self.do_fetch(session, f'{self.stock_server}/se/size?where={where}')
 
             return marketsize['result']
 

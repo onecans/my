@@ -97,7 +97,7 @@ def sync():
     _pytdx.get_ip()
     stock_list = _pytdx.QA_fetch_get_stock_list()
     stock_list.index = stock_list.code
-
+    del stock_list['name']
     df = pd.concat([base_info, stock_list], axis=1, sort=True)
     BaseInfoDb().save(df)
 

@@ -23,6 +23,8 @@ clean:
 
 run:
 	sh run.sh 1>> /u01/logs/mystockservice.log 2>>  /u01/logs/mystockservice.err
+test:
+	python -m lucky
 
 sync_k:
 	pipenv run python lucky/commands/sync_k_files.py

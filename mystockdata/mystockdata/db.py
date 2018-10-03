@@ -137,8 +137,13 @@ class DfDb(Db):
         for c in _columns:
             if c == self.index_col:
                 continue
-            v = pickle.loads(
-                self.db.get(force_bytes(c)))
+            try:
+                v = pickle.loads(
+                    self.db.get(force_bytes(c)))
+            except TypeError:
+                print('try to get %s error' % c)
+                raise
+
             tmp[force_unicode(c)] = v
         index = pickle.loads(self.db.get(force_bytes(self.index_col)))
         if tmp:

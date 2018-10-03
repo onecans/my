@@ -12,7 +12,6 @@ sys.path.insert(0, str(PROJ_ROOT.absolute()))
 try:
     from lucky.redis import close_redis, init_redis
     from lucky.utils import load_config
-    from lucky.leveldb import init_leveldb, close_leveldb
     from lucky.cache import init_cache
 
 except:
@@ -33,13 +32,14 @@ async def init(loop):
         name='lucky',
         config=conf
     )
+    if 'pythonpath' in conf:
+        for p in conf['pythonpath']['names'].split(','):
+            sys.path.insert(0, p)
     # app.on_startup.append(init_mysql)
     app.on_startup.append(init_redis)
     app.on_startup.append(init_cache)
-    app.on_startup.append(init_leveldb)
     # app.on_cleanup.append(close_mysql)
     app.on_cleanup.append(close_redis)
-    app.on_cleanup.append(close_leveldb)
 
     # setup_security(app, CookiesIdentityPolicy(), AuthorizationPolicy(mongo))
 

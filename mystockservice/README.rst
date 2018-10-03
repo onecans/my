@@ -64,7 +64,28 @@ Usage:
     http://127.0.0.1:9001/k/min/2018-01-01/2018-09-01/601600?k=57
         - 相应期间内，近 k 天是否破新低
 
-    http://127.0.0.1:9001/k/min_max_counter/start/end/601600?resample=2w&window_size=365
-        - 获取整个上市区间内，按照 resample 之后，破新高，破新低的股票， 破近期（window_size) 新高新低的股票数
 
     http://127.0.0.1:9001/k/line2/2018-01-01/2018-05-01/601600?col=shares,high&nocache
+
+
+
+
+Usage:
+- 股票列表
+    http://127.0.0.1:9001/se/codelist/SH?nocache
+- 股票基本信息
+    http://127.0.0.1:9001/baseinfo?nocache&col=pe,name
+    http://127.0.0.1:9001/baseinfo/601600?nocache&col=pe,name
+
+- 股票日线
+    http://127.0.0.1:9001/code_info/start/end/601600?nocache
+
+- 股票开始，结束两期间的涨幅，跌幅
+    http://127.0.0.1:9001/k/range/2018-01-01/2018-01-30/601600?col=high&nocache
+
+- 获取整个上市区间内，按照 resample 之后，破新高，破新低的股票， 破近期（window_size) 新高新低的股票数
+    http://127.0.0.1:9001/k/max_counter/601600?nocache   
+    http://127.0.0.1:9001/k/min_counter/601600?nocache 
+
+- 最低点
+    http://127.0.0.1:9001/k/min_k/2018-01-01/end/601600?nocache&k=50&col=volume

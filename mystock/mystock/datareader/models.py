@@ -70,7 +70,7 @@ class PeriodMinCnt(models.Model):
             return self.end_market_size - self.start_market_size
         else:
             return -1
-    
+
     _new_cnt.short_description ='新发行股票数'
 
     new_cnt = property(_new_cnt)
@@ -86,7 +86,7 @@ class PeriodMinCnt(models.Model):
     old_low_cnt = property(_old_low_cnt)
 
     def get_url(self):
-        return '/k/min_max_counter/{code}?resample={resample}&window_size={window_size}&col=low'
+        return '/k/min_counter/{code}?resample={resample}&window_size={window_size}&col=low'
 
     def fetch(self):
         fetch = AioHttpFetch()
@@ -114,7 +114,7 @@ class PeriodMinCnt(models.Model):
 
                 if not df.empty:
                     cnt[c_key] += 1
-                    codes[c_key].append(rst['paras']['code'])
+                    codes[c_key].append(rst['paras']['line'].split(':')[0])
         # print(cnt[key])
 
         market_size = fetch.x_get_marketsize(where=self.where)
