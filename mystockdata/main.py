@@ -1,3 +1,8 @@
+'''
+手工定期执行：  code_base_sync， 同步新股等数据
+手工按需执行：  se_load_old_file， 同步 se 历史数据
+执行： sync_all 同步其他数据，包括k线，市值等数据 
+'''
 import click
 
 from mystockdata import se
@@ -74,10 +79,14 @@ def k_sync(code, force):
 
 @sync.command()
 def sync_all():
+
     # _code_base_sync()
-    # _se_sync()
-    # _xdxr_sync(code=None, from_tdx=None)
+    print('同步交易所当天数据')
+    _se_sync()
+    print('同步k线数据')
     _k_sync(code=None, force=True)
+    print('同步股份数据，用于计算市值')
+    _xdxr_sync(code=None, from_tdx=None)
 
 
 @click.group()
@@ -106,7 +115,7 @@ def code():
 @code.command()
 @click.option('--code', help='Code')
 def code_show(code):
-    from mystockdata.db import CodeDb
+    from mystockdata.code_base import CodeDb
     db = CodeDb(code=code)
     print(db.read())
 

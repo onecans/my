@@ -63,7 +63,7 @@ class PrefixedDb(Db):
             raise ValueError('prefix can not be none')
 
 
-class DfDb(Db):
+class DfIndexDb(Db):
 
     def pre_save(self, df):
         pass
@@ -101,20 +101,90 @@ class DfDb(Db):
         return df
 
 
+class DfDb(Db):
+    index_col = 'index'
+
+    def pre_save(self, df):
+        return df
+
+    def saved_index(self):
+        v = self.db.get(force_bytes(self.index_col))
+        if v:
+            return pickle.loads(v)
+        else:
+            return None
+
+    def save(self, df):
+        df = self.pre_save(df)
+        with self.db.write_batch() as wb:
+            for column in df.columns:
+                v = df[column]
+                self.db.put(column.encode(),
+                            pickle.dumps(v.values))
+            self.db.put(force_bytes(self.index_col), pickle.dumps(df.index))
+
+    def delete(self, columns=None):
+        with self.db.write_batch() as wb:
+            for column in columns if columns else self.keys():
+                self.db.delete(force_bytes(column))
+            if columns is None:
+                self.db.delete(force_bytes(self.index_col))
+
+    def read(self, columns=None):
+        _columns = columns if columns else self.keys()
+        serieses = list()
+        tmp = dict()
+        for c in _columns:
+            if c == self.index_col:
+                continue
+            v = pickle.loads(
+                self.db.get(force_bytes(c)))
+            tmp[force_unicode(c)] = v
+        index = pickle.loads(self.db.get(force_bytes(self.index_col)))
+        if tmp:
+            df = pd.DataFrame(data=tmp, index=index)
+            df = self.handler_result(df)
+
+            return df
+        else:
+            return None
+
+    def handler_result(self, df):
+        return df
+
+
 class DatetimeIndexMixin:
     def handler_result(self, df):
-        df = df.sort_index()
-        df = df.reindex(pd.date_range(
-            min(df.index), max(df.index)), method='ffill')
-        df = df.reindex(pd.date_range(
-            min(df.index), max(df.index)), method='bfill')
-        df = df.fillna(method='ffill')
-        df = df.fillna(method='bfill')
+        # df = df.sort_index()
+        # df = df.reindex(pd.date_range(
+        #     min(df.index), max(df.index)), method='ffill')
+        # df = df.reindex(pd.date_range(
+        #     min(df.index), max(df.index)), method='bfill')
+        # df = df.fillna(method='ffill')
+        # df = df.fillna(method='bfill')
         return df
 
     def pre_save(self, df):
-        if isinstance(df.index, pd.DatetimeIndex):
+        if not isinstance(df.index, pd.DatetimeIndex):
             df.index = pd.DatetimeIndex(df.index)
+
+        saved_index = self.saved_index()
+        if saved_index is not None:
+            if min(df.index) < min(saved_index) or max(df.index) > max(saved_index):
+                tmp = self.read()
+                tmp = tmp[[c for c in tmp.columns if c not in df.columns]]
+
+                df = pd.concat([tmp, df], axis=1)
+                dates = pd.date_range(min(df.index), max(df.index))
+            else:
+                dates = pd.date_range(min(saved_index), max(saved_index))
+        else:
+            dates = pd.date_range(min(df.index), max(df.index))
+        df = df.sort_index()
+        df = df.reindex(dates, method='ffill')
+        df = df.fillna(method='ffill')
+        df = df.fillna(method='bfill')
+        return df
 
 
 class PrefixedDfDb(DfDb):

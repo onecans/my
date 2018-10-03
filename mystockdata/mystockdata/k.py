@@ -8,7 +8,6 @@ from mystockdata.config import BFQ_FILE_PATH, QFQ_FILE_PATH
 
 def sync_code(code, force=False):
     codedb = code_base.CodeDb(code=code)
-
     if not force:
         exists = False
         for key in codedb.keys():
@@ -66,7 +65,7 @@ def sync_code(code, force=False):
             bfq = bfq.groupby(bfq.index).min()
         tmp = tmp.reindex(
             dates, method='ffill')
-        bfq = bfq.reindex(dates,method='ffill')
+        bfq = bfq.reindex(dates, method='ffill')
 
         tmp = pd.concat([tmp, bfq], axis=1, join='inner')
 

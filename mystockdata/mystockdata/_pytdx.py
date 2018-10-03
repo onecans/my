@@ -5,7 +5,6 @@ from pytdx.hq import TdxHq_API
 from pytdx.util.best_ip import select_best_ip
 
 ip = None
-# ip = '202.108.253.130'
 
 
 def get_ip():
