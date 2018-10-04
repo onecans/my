@@ -110,7 +110,7 @@ def main(resample, window_size, min_timetomarket, where, test):
     破新高和新低的股票数
     """
     print('='*50)
-    print(f'破新高和新低的股票数')
+    print('破新高和新低的股票数')
 
     import time
     b = time.time()

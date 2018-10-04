@@ -81,7 +81,7 @@ class Combin(GetServiceObject):
         if baseinfo:
             self.query['baseinfo'] = 1
         self.query['k'] = k
-        self.url = f'{host}/k/combin/{self.start}/{self.end}/{self.code}'
+        self.url = '{host}/k/combin/{self.start}/{self.end}/{self.code}'.format(**locals())
 
         if self.query:
             self.url = '?'.join([self.url, '&'.join(['%s=%s' % (key, value) for key, value in self.query.items()])])

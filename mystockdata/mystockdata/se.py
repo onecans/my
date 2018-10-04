@@ -180,18 +180,6 @@ class SZSE:
 
             return pd.concat(tmp)
 
-        # def read_cache(category):
-        #     p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / \
-        #         'data' / 'szse' / f'{category}_day_overview.csv'
-        #     df = pd.read_csv(str(p), index_col='date')
-        #     df.index = pd.DatetimeIndex(df.index)
-        #     return df
-
-        # def write_cache(df, category):
-        #     p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / \
-        #         'data' / 'szse' / f'{category}_day_overview.csv'
-        #     df.to_csv(str(p), index_label='date')
-
         cache_df = self.read_cache(category)
         if cache_df is None or cache_df.empty:
             raise HistoryDataError()
@@ -237,13 +225,18 @@ class SE:
 
     @classmethod
     def get_market_val(cls):
-        return cls.get_overview_day_field('A_marketValue1', 'B_marketValue1', 'SH_marketValue1',
-                                          '股票总市值（元）', '上市公司市价总值(元)', '上市公司市价总值(元)', '上市公司市价总值(元)',)
+        df = cls.get_overview_day_field('A_marketValue1', 'B_marketValue1', 'SH_marketValue1',
+                                        '股票总市值（元）', '上市公司市价总值(元)', '上市公司市价总值(元)', '上市公司市价总值(元)',)
+
+        df[['SZ', 'CYB', 'ZXQY']] = df[['SZ', 'CYB', 'ZXQY']] / 100000000
+        return df
 
     @classmethod
     def get_negotiable_val(cls):
-        return cls.get_overview_day_field('A_negotiableValue', 'B_negotiableValue', 'SH_negotiableValue',
-                                          '股票流通市值（元）', '上市公司流通市值(元)', '上市公司流通市值(元)', '上市公司流通市值(元)',)
+        df = cls.get_overview_day_field('A_negotiableValue', 'B_negotiableValue', 'SH_negotiableValue',
+                                        '股票流通市值（元）', '上市公司流通市值(元)', '上市公司流通市值(元)', '上市公司流通市值(元)',)
+        df[['SZ', 'CYB', 'ZXQY']] = df[['SZ', 'CYB', 'ZXQY']] / 100000000
+        return df
 
     @classmethod
     def get_avg_price(cls):

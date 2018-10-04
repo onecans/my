@@ -16,3 +16,7 @@ async def loads_base_info(app, columns, codes=None):
     if codes == ['ALL']:
         codes = None
     return await backend.loads_base_info(columns, codes=codes)
+
+
+async def se_info(app, column, category):
+    return await backend.se_info(column, category)

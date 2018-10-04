@@ -45,7 +45,6 @@ def _def_paras(request):
 
 def _build_line(request):
     code, start, end, col, nocache = _def_paras(request)
-    print(code, start, end, col, nocache)
     line = Line(code=code, app=request.app, start=start,
                 end=end, col=col, nocache=nocache)
     return line
@@ -119,6 +118,20 @@ async def codelist(request):
                  if timetomarket < int(start_timetomarket)]
 
     return json_response(codes, paras={'where': where})
+
+
+@cache(expires=60*60*12)
+@routes.get('/se/info')
+async def seinfo(request):
+    col = request.query.get('col')
+    if not col:
+        raise web.HTTPBadRequest(reason='col 必输')
+
+    category = request.query.get('category', '')
+
+    rst = await services.se_info(request.app, col, category)
+
+    return json_response(rst, paras={'col': col, 'category': category})
 
 
 @routes.get('/se/size')

@@ -69,6 +69,9 @@ def _k_sync(code, force):
             for code in bar:
                 k.sync_code(code=code, force=force)
 
+        for code in ['999999', '399001', '399005', '399006']:
+            k.sync_code(code=code, force=force)
+
 
 @sync.command()
 @click.option('--code', default=None, help='Code')

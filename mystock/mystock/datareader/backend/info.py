@@ -1,6 +1,7 @@
 import glob
 import pathlib
 from collections import UserDict
+
 import numpy as np
 import pandas as pd
 
@@ -50,7 +51,7 @@ class IndexInfo(Info):
         return pathlib.Path(self.file_path) / 'index_info'
 
     def __getitem__(self, key):
-        _key = f'index_{key}'
+        _key = 'index_{key}'.format(**locals())
         try:
             return self.df().loc[_key]
         except KeyError:

@@ -11,7 +11,7 @@ def line_with_min_volume(start, end, codes, k=20):
         overlap = Overlap()
         line = Line()
         name = data['baseinfo']['name'][code]
-        title = f'{code}:{name}~{start}~{end}'
+        title = '{code}:{name}~{start}~{end}'.format(**locals())
         line.add(title, [x for x in data['line'].keys()],
                  [x for x in data['line'].values()],  is_more_utils=True)
         overlap.add(line)

@@ -15,11 +15,10 @@ from hashlib import md5
 import numpy as np
 import pandas as pd
 import requests
+from datareader.backend.fin import get_fin
 from django.conf import settings
 from django.core.cache import cache
 from pytdx.reader.history_financial_reader import HistoryFinancialReader
-
-from datareader.backend.fin import get_fin
 
 # _orgin_read_csv = pd.read_csv
 # def _read_csv(*args, **kwargs):
@@ -51,7 +50,7 @@ def cache_df(func):
         _args = [str(arg) for arg in args]
         _kwargs = ['%s~%s' % (str(key), str(value)) for key, value in kwargs.items()]
         csv_file = '-'.join(_args) + '__' + '--'.join(_kwargs)
-        csv_path = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'tdx_cache' / f'{csv_file}'
+        csv_path = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'tdx_cache' / '{csv_file}'.format(**locals())
         if csv_path.exists():
             tmp = pd.read_feather(csv_path)
             tmp.index = pd.DatetimeIndex(tmp['date'])
@@ -335,14 +334,14 @@ class TDXDataBackend(BaseStockDataBackend):
         path = path / self.FQ_TYPE
         if index:
             if code.startswith('3'):
-                file_path = path / f'SZ#{code}.txt'
+                file_path = path / 'SZ#{code}.txt'.format(code=code).format(code=code)
             else:
-                file_path = path / f'SH#{code}.txt'
+                file_path = path / 'SH#{code}.txt'.format(code=code)
         else:
-            file_path = path / f'SH#{code}.txt'
+            file_path = path / 'SH#{code}.txt'.format(code=code)
 
             if not file_path.exists():
-                file_path = path / f'SZ#{code}.txt'
+                file_path = path / 'SZ#{code}.txt'.format(code=code)
 
         if not file_path.exists():
             return None
@@ -429,7 +428,7 @@ class TDXDataBackend(BaseStockDataBackend):
             return c
 
         rst = [f.name.split('#')[1].split('.')[0]
-               for f in path.glob(f'{where}*.txt') if f.name.find('#') >= 0]
+               for f in path.glob('{where}*.txt'.format(where=where)) if f.name.find('#') >= 0]
 
         if sample:
             return random.sample(rst, sample)
@@ -647,13 +646,13 @@ class SZSE:
             return pd.concat(tmp)
 
         def read_cache(category):
-            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'szse' / f'{category}_day_overview.csv'
+            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'szse' / '{category}_day_overview.csv'.format(**locals())
             df = pd.read_csv(str(p), index_col='date')
             df.index = pd.DatetimeIndex(df.index)
             return df
 
         def write_cache(df, category):
-            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'szse' / f'{category}_day_overview.csv'
+            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'szse' / '{category}_day_overview.csv'.format(**locals())
             df.to_csv(str(p), index_label='date')
 
         cache_df = read_cache(category)
@@ -825,11 +824,11 @@ class RZRQ:
 
         def read_cache(code, index):
             if index:
-                file_name = f'index_{code}.csv'
+                file_name = 'index_{code}.csv'.format(**locals())
             else:
-                file_name = f'{code}.csv'
+                file_name = '{code}.csv'.format(**locals())
 
-            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'rzrq' / f'{file_name}'
+            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'rzrq' / '{file_name}'.format(**locals())
             if p.exists():
                 df = pd.read_csv(str(p), index_col='date')
                 df.index = pd.DatetimeIndex(df.index)
@@ -838,11 +837,11 @@ class RZRQ:
 
         def write_cache(df, code, index):
             if index:
-                file_name = f'index_{code}.csv'
+                file_name = 'index_{code}.csv'.format(**locals())
             else:
-                file_name = f'{code}.csv'
+                file_name = '{code}.csv'.format(**locals())
 
-            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'rzrq' / f'{file_name}'
+            p = pathlib.Path(str(settings.APPS_DIR)) / 'datareader' / 'data' / 'rzrq' / '{file_name}'.format(**locals())
             df.to_csv(str(p), index_label='date')
         cache_df = read_cache(code, index)
         if cache_df is None:
@@ -887,12 +886,12 @@ class TDX:
         path = pathlib.Path(self.TDX_STOCK_DIR)
         path = path / self.FQ_TYPE
         if index:
-            file_path = path / f'{code}.txt'
+            file_path = path / '{code}.txt'.format(**locals())
         else:
-            file_path = path / f'SH#{code}.txt'
+            file_path = path / 'SH#{code}.txt'.format(code=code)
 
             if not file_path.exists():
-                file_path = path / f'SZ#{code}.txt'
+                file_path = path / 'SZ#{code}.txt'.format(code=code)
 
         if not file_path.exists():
             return None
@@ -951,7 +950,7 @@ class TDX:
             return c
 
         rst = [f.name.split('#')[1].split('.')[0]
-               for f in path.glob(f'{where}*.txt') if f.name.find('#') >= 0]
+               for f in path.glob('{where}*.txt'.format(**locals())) if f.name.find('#') >= 0]
 
         if sample:
             return random.sample(rst, sample)

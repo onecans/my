@@ -22,18 +22,18 @@ def sync_code(code, force=False):
     k_file_path = pathlib.Path(QFQ_FILE_PATH)
     bfq_k_file_path = pathlib.Path(BFQ_FILE_PATH)
     in_sh = in_sz = False
-    if (k_file_path / f'SH#{code}.txt').exists():
-        file_name = f'SH#{code}.txt'
+    if (k_file_path / 'SH#{code}.txt'.format(code=code)).exists():
+        file_name = 'SH#{code}.txt'.format(code=code)
         in_sh = True
-    elif (k_file_path / f'SZ#{code}.txt').exists():
-        file_name = f'SZ#{code}.txt'
+    elif (k_file_path / 'SZ#{code}.txt'.format(code=code)).exists():
+        file_name = 'SZ#{code}.txt'.format(code=code)
         in_sz = True
     else:
-        print(f'{code}: not found file')
+        print('{code}: not found file'.format(code=code))
         return
 
     if in_sh and in_sz:
-        print(f'code, {code} error, 存在于两个市场')
+        print('code, {code} error, 存在于两个市场'.format(code=code))
 
     tmp = pd.read_csv(k_file_path/file_name, skiprows=1, engine='python',
                       encoding='gbk', sep='\t', skipfooter=1)

@@ -17,20 +17,7 @@ async def dumps(df, key, db, redis):
     await db_delete_df(db, key, df)
     keys = await df_to_db(db, key, df)
 
-    # keys = [f'{key}__{column}' for column in df.columns]
-    # keys.append(f'{key}__index')
-    # for _key in keys:
-    #     await db_delete(db, _key)
-
-    # for column in df.columns:
-    #     await series_to_db(db, column_key(key, column), df[column])
-
-    # await series_to_db(db, index_key(key), df.index)
-
-    # await db.execute('SET', f'{key}_columns', df.to_json(orient='columns'))
-    # await db.execute('HSET', 'SH')
     where, code = parse_file_name(key)
-    # print("HSET", where, code, key)
     await redis.execute('HSET', where, code, key)
     if where in ('SH', 'SZ'):
         await redis.execute('HSET', 'ALL', code, key)

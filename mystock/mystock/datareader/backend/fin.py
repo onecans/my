@@ -57,7 +57,7 @@ class FinFile:
         return m.hexdigest()
 
     def _down_load(self):
-        print(f'down {self.down_url} ==> {self.cache_file_name}')
+        print('down {self.down_url} ==> {self.cache_file_name}'.format(**locals()))
         r = requests.get(self.down_url, stream=True)
         with open(self.cache_file_name, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):

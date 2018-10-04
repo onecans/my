@@ -1,18 +1,19 @@
 # encoding=utf-8
+import datetime
 import os
+import time
 from collections import OrderedDict
 from multiprocessing.pool import Pool as ThreadPool
 
 import pandas as pd
 import tushare as ts
-import time
-from .basic import get_timeToMarket, get_code_list, LAST_MARKET_DAY, is_trade, get_outstanding, get_sh_code_list
+
+from .basic import LAST_MARKET_DAY, get_code_list, get_outstanding, get_sh_code_list, get_timeToMarket, is_trade
 from .settings import CACHE_DIR, ONLY_CACHE
 from .utils import parse_code
 
 DATE_FORMATE = '%Y-%m-%d'
 
-import datetime
 def _save_qfq(code, index=False):
     try:
         cache_file = cache_file_name(code, index)
@@ -100,7 +101,7 @@ def _get_qfq_from_163(code, bdate=None, edate=None, index=False):
     _code = '0' + code
     fields = '%3b'.join(['TCLOSE', 'HIGH', 'LOW', 'TOPEN', 'LCLOSE', 'CHG', 'PCHG',
                         'TURNOVER', 'VOTURNOVER', 'VATURNOVER', 'TCAP', 'MCAP'])
-    url = f'http://quotes.money.163.com/service/chddata.html?code={_code}&start={start_date}&end={end_date}&fields={fields}'
+    url = 'http://quotes.money.163.com/service/chddata.html?code={_code}&start={start_date}&end={end_date}&fields={fields}'.format(**locals())
     df = pd.read_csv(url, encoding='gbk')
     df.columns = ['date','code','name','close','high','low','open','pre','change','chg','turnover','volume','amount','cap','famc']
 

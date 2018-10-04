@@ -83,6 +83,6 @@ class RZRQ(DfMixin):
     @property
     def df_file(self):
         if self.index:
-            return pathlib.Path(self.file_path) / f'index_{self.code}'
+            return pathlib.Path(self.file_path) / 'index_{self.code}'.format(**locals())
         else:
-            return pathlib.Path(self.file_path) / f'{self.code}'
+            return pathlib.Path(self.file_path) / '{self.code}'.format(**locals())

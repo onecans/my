@@ -19,13 +19,13 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
                     'end_market_size',
                     'end_profit',
                     'profit_without_new',
-                    'period_end', 'new_cnt','old_low_cnt'
+                    'period_end', 'new_cnt', 'old_low_cnt'
 
                     )
 
     list_filter = ('where',)
     search_fields = ('period_start',)
-    actions = ['fetch', 'compare_codes','copy']
+    actions = ['fetch', 'compare_codes', 'copy']
     actions_on_top = True
     list_per_page = 1000
 
@@ -110,12 +110,12 @@ class RangeAnalyseAdmin(admin.ModelAdmin):
             r, c = x.split(':')
             s += int(c)
 
-        rst = f'<table><tr><td>{t}</td>'
+        rst = '<table><tr><td>{t}</td>'.format(**locals())
         for x in obj.cnts.split('~'):
             r, c = x.split(':')
             if float(r) < 0:
                 continue
-            rst += f'<td>{r}</td>'
+            rst += '<td>{r}</td>'.format(**locals())
 
         rst += '</tr><tr><td>数量</td>'
         for x in obj.cnts.split('~'):
@@ -123,7 +123,7 @@ class RangeAnalyseAdmin(admin.ModelAdmin):
             if float(r) < 0:
                 continue
             p = round(int(c) / s, 2)
-            rst += f'<td>{c}<br>{p}</td>'
+            rst += '<td>{c}<br>{p}</td>'.format(**locals())
 
         rst += '</tr></table>'
 

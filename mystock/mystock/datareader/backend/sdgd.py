@@ -78,7 +78,7 @@ class SDGD(IndexDfMixin):
 
     @property
     def df_file(self):
-        return pathlib.Path(self.file_path) / f'sdgd'
+        return pathlib.Path(self.file_path) / 'sdgd'
 
     def valid_codes(self):
         if self.df_file.exists():

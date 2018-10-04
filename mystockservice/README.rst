@@ -89,3 +89,8 @@ Usage:
 
 - 最低点
     http://127.0.0.1:9001/k/min_k/2018-01-01/end/601600?nocache&k=50&col=volume
+
+
+- pe
+    http://127.0.0.1:9001/se/info?col=pe&category=SHA
+    http://127.0.0.1:9001/se/info?col=pe&category=sh

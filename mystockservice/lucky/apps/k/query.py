@@ -15,7 +15,7 @@ def valid(d):
                 if key in kwargs:
                     if kwargs[key] not in value:
                         raise KeyError(
-                            f'Parameter {key} must be one of {value}')
+                            'Parameter {key} must be one of {value}'.format(**locals()))
             rst = func(*args, **kwargs)
             return rst
         return _wrap
@@ -31,7 +31,8 @@ def mandatory_cols(cols):
                 raise ValueError('df can not be None')
             for col in cols:
                 if col not in self.df.columns:
-                    raise ValueError(f'{col} must be in df columns')
+                    raise ValueError(
+                        '{col} must be in df columns'.format(**locals()))
 
             return func(self, *args, **kwargs)
         return _wrap
@@ -69,7 +70,6 @@ async def _line(paras):
 
     start = paras.start if paras.start != 'start' else min(df.index)
     end = paras.end if paras.end != 'end' else max(df.index)
-    print(start, end)
     ds = pd.date_range(start, end)
     df = df.reindex(ds, method='bfill',
                     copy=False, fill_value=np.NaN)
@@ -98,7 +98,6 @@ class Line:
         return self
 
     def col(self, col):
-        print(col)
         self.cols = col.split(',')
         return self
 
@@ -107,7 +106,7 @@ class Line:
         return self
 
     def __str__(self):
-        return f'{self.code}:{self.cols}@[{self.start}-{self.end}]/{self.app}'
+        return '{self.code}:{self.cols}@[{self.start}-{self.end}]/{self.app}.format(**locals())'
 
     # @cache_df(expires=12*60*60)
     async def _to_df(self, app=None):
@@ -255,7 +254,6 @@ class LineDf:
 
     @mandatory_cols(['low', 'high'])
     def range(self, start1, end1, start2, end2):
-        print(start1, end1, start2, end2)
         # 最高点到最低点
         rst = {}
         # print(self.df)

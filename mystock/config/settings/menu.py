@@ -31,24 +31,24 @@ SUIT_CONFIG = {
             {'label': 'ZXQY', 'icon': 'icon-bookmark', 'url': '/datareader/market_val/ZXQY'}
         )},
 
-        {'label': '区间跌幅', 'icon': 'icon-th-list', 'models': (
-            {'label': 'ALL', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331'},
-            {'label': 'SH', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SH'},
-            {'label': 'SZ', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SZ'},
-        )},
+        # {'label': '区间跌幅', 'icon': 'icon-th-list', 'models': (
+        #     {'label': 'ALL', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331'},
+        #     {'label': 'SH', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SH'},
+        #     {'label': 'SZ', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SZ'},
+        # )},
 
-        {'label': '区间涨幅', 'icon': 'icon-th-list', 'models': (
-            {'label': 'ALL', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?'},
-            {'label': 'SH', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SH'},
-            {'label': 'SZ', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SZ'},
-        )},
+        # {'label': '区间涨幅', 'icon': 'icon-th-list', 'models': (
+        #     {'label': 'ALL', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?'},
+        #     {'label': 'SH', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SH'},
+        #     {'label': 'SZ', 'icon': 'icon-bookmark', 'url': '/datareader/range/20180101/20180331?where=SZ'},
+        # )},
 
 
-        {'label': '最高价位分布', 'icon': 'icon-th-list', 'models': (
-            {'label': 'ALL', 'icon': 'icon-bookmark', 'url': '/datareader/max_date/20180101/20180331?'},
-            {'label': 'SH', 'icon': 'icon-bookmark', 'url': '/datareader/max_date/20180101/20180331?where=SH'},
-            {'label': 'SZ', 'icon': 'icon-bookmark', 'url': '/datareader/max_date/20180101/20180331?where=SZ'},
-        )},
+        # {'label': '最高价位分布', 'icon': 'icon-th-list', 'models': (
+        #     {'label': 'ALL', 'icon': 'icon-bookmark', 'url': '/datareader/max_date/20180101/20180331?'},
+        #     {'label': 'SH', 'icon': 'icon-bookmark', 'url': '/datareader/max_date/20180101/20180331?where=SH'},
+        #     {'label': 'SZ', 'icon': 'icon-bookmark', 'url': '/datareader/max_date/20180101/20180331?where=SZ'},
+        # )},
 
 
     )

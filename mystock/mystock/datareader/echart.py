@@ -1,12 +1,14 @@
 import concurrent.futures
-
-import pandas as pd
-import numpy as np
-from datareader import backend
-from datareader.base import SE, RZRQ
-from pyecharts import *
 import math
+
+import numpy as np
+import pandas as pd
+from datareader import backend
+from datareader.base import RZRQ, SE
+from pyecharts import *
 from pyecharts import Overlap
+
+from . import services
 
 
 def float_reindex(df1, df2):
@@ -48,10 +50,10 @@ def get_range_bar(start, end, where='', sample='', fq_type='qfq'):
     df3, df4 = float_reindex(df3, df4)
 
     line = Bar()
-    line.add(f'{_start_show}-{_end_show}-跌幅-{fq_type}-{where}-数量_max', df3.index, df3)
+    line.add('{_start_show}-{_end_show}-跌幅-{fq_type}-{where}-数量_max'.format(**locals()), df3.index, df3)
 
     line2 = Bar()
-    line2.add(f'数量_current', df4.index, df4)
+    line2.add('数量_current', df4.index, df4)
 
     overlap = Overlap()
     overlap.add(line)
@@ -60,6 +62,7 @@ def get_range_bar(start, end, where='', sample='', fq_type='qfq'):
     overlap.add(line2, yaxis_index=1, is_add_yaxis=True)
 
     return overlap, df3, df4
+
 
 def get_grow_range_bar(start, end, where='', sample='', fq_type='qfq'):
     '''
@@ -82,10 +85,10 @@ def get_grow_range_bar(start, end, where='', sample='', fq_type='qfq'):
     df3, df4 = float_reindex(df3, df4)
 
     line = Bar()
-    line.add(f'{_start_show}-{_end_show}-涨幅-{fq_type}-{where}-数量_max', df3.index, df3)
+    line.add('{_start_show}-{_end_show}-涨幅-{fq_type}-{where}-数量_max'.format(**locals()), df3.index, df3)
 
     line2 = Bar()
-    line2.add(f'数量_current', df4.index, df4)
+    line2.add('数量_current', df4.index, df4)
 
     overlap = Overlap()
     overlap.add(line)
@@ -116,25 +119,23 @@ def get_max_date_bar(start, end,  where='', sample='', fq_type='qfq', **kwargs):
     df2 = df.groupby('val').size().sort_index()
     df2.index = pd.DatetimeIndex(df2.index)
 
-
     market_val = backend.get_market_val()
     df['market_val'] = market_val
     df3 = df.groupby('val').sum()
 
     print(type(df2))
 
-    df2,df3 = reindex([df2,df3], method=None, fill_value=0)
+    df2, df3 = reindex([df2, df3], method=None, fill_value=0)
     print(df2, df3)
 
     df2 = df2.resample('W').sum()
     df3 = df3.resample('W').sum()
 
     line = Line()
-    line.add(f'数量 | {_start_show} 至 {_end_show} | {where}-{fq_type}', df2.index, df2)
-
+    line.add('数量 | {_start_show} 至 {_end_show} | {where}-{fq_type}'.format(**locals()), df2.index, df2)
 
     line2 = Line()
-    line2.add(f'市值', df3.index, df3.market_val)
+    line2.add('市值', df3.index, df3.market_val)
 
     overlap = Overlap()
     overlap.add(line)
@@ -168,18 +169,18 @@ def get_line(code, start=None, end=None, index=False, cache=True, field='high', 
 
     line = Line()
     if index:
-        show = f'index：{code}'
+        show = 'index：{code}'.format(**locals())
     else:
         show = code
     if alpha:
-        show = f'{show}-alpha：{alpha}'
+        show = '{show}-alpha：{alpha}'.format(**locals())
 
     df = df.reindex(pd.date_range(min(df.index), max(df.index)), method='bfill')
     line.add(show, df.index, df.high, is_more_utils=True)
     return line, df
 
 
-def reindex(dfs,method='bfill',fill_value=np.NaN):
+def reindex(dfs, method='bfill', fill_value=np.NaN):
     tmp = []
     for df in dfs:
         tmp.append(df.dropna(how='all'))
@@ -193,8 +194,8 @@ def reindex(dfs,method='bfill',fill_value=np.NaN):
     return _tmp
 
 
-indexs = {'SHA': '000001', 'SH': '000001', 'SZ': '399001',
-          'ZXQY': '399005', 'CYB': '399006', 'SZZB': '399001'}
+indexs = {'SHA': '999999', 'SH': '999999', 'SZ': '399001',
+          'ZXQY': '399005', 'CYB': '399006', 'SZZB': '399001', 'SHB': '999999'}
 
 
 def _check_category(category):
@@ -205,7 +206,7 @@ def _check_category(category):
     return True
 
 
-def show_overview_day(category, method, name):
+def show_overview_day2(category, method, name):
     # if not _check_category(category):
     #     return
 
@@ -233,24 +234,68 @@ def show_overview_day(category, method, name):
     return overlap
 
 
+def reindex2(dfs, method='bfill', fill_value=np.NaN):
+
+    start = min([min(df.index) for df in dfs])
+    end = max([max(df.index) for df in dfs])
+    print(start, end)
+    _tmp = []
+    for df in dfs:
+        df = df.reindex(pd.date_range(start, end), method=method, copy=False)
+        _tmp.append(df)
+    return _tmp
+
+
+def show_overview_day(category, method, name):
+
+    # if not _check_category(category):
+
+    index_data = services.line(indexs.get(category, '999999'), 'start', 'end', col='high')
+    se_data = services.se(method[4:], category)
+
+    df1 = pd.DataFrame.from_dict(index_data)
+    df1.index = pd.DatetimeIndex(df1.index)
+
+    df2 = pd.DataFrame.from_dict(se_data)
+    df2.index = pd.DatetimeIndex(df2.index)
+
+    df1, df2 = reindex2([df1, df2])
+    print(df1)
+    print(df2)
+    line1 = Line()
+    line1.add(name, df2.index, df2[category.upper()], is_datazoom_show=False)
+    line2 = Line()
+    line2.add('index: %s' % indexs.get(category, '999999'),
+              df1.index, df1['high'], is_datazoom_show=True)
+
+    overlap = Overlap()
+    overlap.add(line1)
+    # 新增一个 y 轴，此时 y 轴的数量为 2，第二个 y 轴的索引为 1（索引从 0 开始），所以设置 yaxis_index = 1
+    # 由于使用的是同一个 x 轴，所以 x 轴部分不用做出改变
+
+    overlap.add(line2, yaxis_index=1, is_add_yaxis=True)
+    return overlap
+
+
 def negotiable_val(category):
     if _check_category(category):
         return show_overview_day(category, 'get_negotiable_val', '流通市值')
     elif category == 'ALL':
         page = Page()
-        for c in ('SHA','SZ','CYB','ZXQY'):
-            page.add(show_overview_day(c, 'get_negotiable_val', '流通市值-%s' %c))
-        page.render('staticfiles/show/negotiable_val.html')
+        for c in ('SHA', 'SZ', 'CYB', 'ZXQY'):
+            page.add(show_overview_day(c, 'get_negotiable_val', '流通市值-%s' % c))
+        # page.render('staticfiles/show/negotiable_val.html')
         return page
+
 
 def market_val(category):
     if _check_category(category):
         return show_overview_day(category, 'get_market_val', '市值')
     elif category == 'ALL':
         page = Page()
-        for c in ('SHA','SZ','CYB','ZXQY'):
-            page.add(show_overview_day(c, 'get_market_val', '市值-%s' %c))
-        page.render('staticfiles/show/market_val.html')
+        for c in ('SHA', 'SZ', 'CYB', 'ZXQY'):
+            page.add(show_overview_day(c, 'get_market_val', '市值-%s' % c))
+        # page.render('staticfiles/show/market_val.html')
         return page
 
 
@@ -259,11 +304,10 @@ def pe(category):
         return show_overview_day(category, 'get_pe', 'PE')
     elif category == 'ALL':
         page = Page()
-        for c in ('SHA','SZ','CYB','ZXQY'):
-            page.add(show_overview_day(c, 'get_pe', 'PE-%s' %c))
-        page.render('staticfiles/show/pe.html')
+        for c in ('SHA', 'SZ', 'CYB', 'ZXQY'):
+            page.add(show_overview_day(c, 'get_pe', 'PE-%s' % c))
+        # page.render('staticfiles/show/pe.html')
         return page
-
 
 
 def _rzrq(code, start='2010-03-31', end=None, index=False):
@@ -288,16 +332,17 @@ def _rzrq(code, start='2010-03-31', end=None, index=False):
     overlap.add(line2, yaxis_index=1, is_add_yaxis=True)
     return overlap
 
+
 def rzrq(code, start='2010-03-31', end=None, index=False):
     if code != 'ALL':
         return _rzrq(code, start=start, end=end, index=index)
     else:
         page = Page()
-        for code in ('000001','399001'):
+        for code in ('000001', '399001'):
             l = _rzrq(str(code), index=True)
             page.add(l)
 
-        for code in (601088, 601668, 601898, 601992, 601318 , 601600, 601390):
+        for code in (601088, 601668, 601898, 601992, 601318, 601600, 601390):
             l = _rzrq(str(code), index=False)
             page.add(l)
         page.render('staticfiles/show/rzrq.html')

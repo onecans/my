@@ -19,16 +19,10 @@ def get_server():
     return stock_server
 
 
-def line(code, start, end, col, is_index):
+def line(code, start, end, col):
     stock_server = get_server()
     query = {}
-    if is_index:
-        code = f'INDEX_{code}'
-
-        line_url = f'{stock_server}/k/line/{start}/{end}/{code}'
-        query['where'] = 'INDEX'
-    else:
-        line_url = f'{stock_server}/k/line/{start}/{end}/{code}'
+    line_url = '{stock_server}/code_info/{start}/{end}/{code}'.format(**locals())
     if col:
         query['col'] = col
     print(line_url, query)
@@ -36,10 +30,22 @@ def line(code, start, end, col, is_index):
     return tmp
 
 
+def se(col, category):
+    stock_server = get_server()
+    url = '{stock_server}/se/info'.format(**locals())
+    query = {}
+    query['col'] = col
+    if category:
+        query['category'] = category
+    print(url, query)
+    tmp = requests.get(url, params=query).json()['result']
+    return tmp
+
+
 def baseinfo(code, col):
     stock_server = get_server()
     query = {}
-    url = f'{stock_server}/baseinfo/{code}'
+    url = '{stock_server}/baseinfo/{code}'.format(**locals())
     query['col'] = col
     tmp = requests.get(url, params=query).json()['result']
     rst = {}
@@ -71,14 +77,14 @@ class AioHttpFetch():
         # return ['601600']
         async with aiohttp.ClientSession() as session:
             if min_timetomarket:
-                codes = await self.do_fetch(session, f'{self.stock_server}/se/codelist/{where}?start_timetomarket={min_timetomarket}')
+                codes = await self.do_fetch(session, '{self.stock_server}/se/codelist/{where}?start_timetomarket={min_timetomarket}'.format(**locals()))
             else:
-                codes = await self.do_fetch(session, f'{self.stock_server}/se/codelist/{where}')
+                codes = await self.do_fetch(session, '{self.stock_server}/se/codelist/{where}'.format(**locals()))
             return codes['result']
 
     async def get_marketsize(self, where="ALL",):
         async with aiohttp.ClientSession() as session:
-            marketsize = await self.do_fetch(session, f'{self.stock_server}/se/size?where={where}')
+            marketsize = await self.do_fetch(session, '{self.stock_server}/se/size?where={where}'.format(**locals()))
 
             return marketsize['result']
 

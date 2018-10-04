@@ -21,9 +21,9 @@ async def get_codes(where="ALL", min_timetomarket=None):
 
     async with aiohttp.ClientSession() as session:
         if min_timetomarket:
-            codes = await do_fetch(session, f'http://127.0.0.1:9001/k/codes/{where}?start_timetomarket={min_timetomarket}')
+            codes = await do_fetch(session, 'http://127.0.0.1:9001/k/codes/{where}?start_timetomarket={min_timetomarket}'.format(**locals()))
         else:
-            codes = await do_fetch(session, f'http://127.0.0.1:9001/k/codes/{where}')
+            codes = await do_fetch(session, 'http://127.0.0.1:9001/k/codes/{where}'.format(**locals()))
         return codes['result']
 
 
@@ -59,7 +59,7 @@ async def process(file_name, start, end, k=90, min_timetomarket=None):
     for r in rsts:
         print(r[0])
     cnt = len(rsts)
-    print(f'共{cnt}只股票')
+    print('共{cnt}只股票'.format(**locals()))
 
 
 @click.command()
@@ -73,7 +73,7 @@ def main(start, end,  last_days, file_name, min_timetomarket):
     近{last_days}破新低的股票列表
     """
     print('='*50)
-    print(f'近{last_days}天，从{start}至{end} 破新低的股票列表:')
+    print('近{last_days}天，从{start}至{end} 破新低的股票列表:'.format(**locals()))
     import time
     b = time.time()
     loop = asyncio.get_event_loop()

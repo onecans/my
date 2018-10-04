@@ -176,6 +176,12 @@ async def k_max(paras):
         return False
 
 
+async def se_info(app, column, category=None):
+    df = await backends.se_info(app, column, category)
+    print(df.index)
+    df.index = df.index.strftime('%Y-%m-%d')
+    return df.to_dict()
+
 # async def k_min_max_counter(paras):
 #     window_size = int(paras.query.get('window_size', 52*7))
 #     resample = paras.query.get('resample', '')

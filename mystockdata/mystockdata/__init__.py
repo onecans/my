@@ -17,8 +17,16 @@ def code_info(code, columns):
     return db.read(columns=columns)
 
 
-def se_info(columns):
-    raise NotImplementedError
+def se_info(column, category=None):
+    if column not in ('pe', 'market_val', 'negotiable_val', 'avg_price'):
+        raise NotImplementedError
+
+    method = 'get_%s' % column
+    obj = SE()
+    df = getattr(obj, method)()
+    if category == 'sh':
+        return df['SHA', 'SHB', 'SH']
+    return df[[category.upper()]]
 
 
 def code_list(where='ALL'):

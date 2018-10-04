@@ -23,15 +23,15 @@ async def get_codes(where="ALL", min_timetomarket=None):
     # return ['601600']
     async with aiohttp.ClientSession() as session:
         if min_timetomarket:
-            codes = await do_fetch(session, f'{HOST}/k/codes/{where}?start_timetomarket={min_timetomarket}')
+            codes = await do_fetch(session, '{HOST}/k/codes/{where}?start_timetomarket={min_timetomarket}'.format(**locals()))
         else:
-            codes = await do_fetch(session, f'{HOST}/k/codes/{where}')
+            codes = await do_fetch(session, '{HOST}/k/codes/{where}'.format(**locals()))
         return codes['result']
 
 
 async def get_marketsize(where="ALL",):
     async with aiohttp.ClientSession() as session:
-        marketsize = await do_fetch(session, f'{HOST}/k/marketsize?where={where}')
+        marketsize = await do_fetch(session, '{HOST}/k/marketsize?where={where}'.format(**locals()))
         print(marketsize)
         return marketsize['result']
 

@@ -28,10 +28,13 @@ async def code_list(where):
 
 
 async def loads_base_info(columns, codes=None):
-    print(columns, codes)
     df = mystockdata.base_info(columns, codes)
     return df
 
 
 async def code_info(code, columns=None):
     return mystockdata.code_info(code, columns)
+
+
+async def se_info(column, category):
+    return mystockdata.se_info(column, category)
