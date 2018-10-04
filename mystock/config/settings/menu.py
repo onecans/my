@@ -8,6 +8,10 @@ SUIT_CONFIG = {
 
         # Keep original label and models
         # 'sites','auth',
+        {'label': '破新低统计', 'icon': 'icon-th-list', 'models': (
+            {'model': 'datareader.periodmincnt', 'label': '破新低统计', },
+            {'model': 'datareader.marketdateanalyse', 'label': '新股发行统计', },
+        )},
         '-', '-', '-',
 
         {'label': 'PE', 'icon': 'icon-th-list', 'models': (
