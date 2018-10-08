@@ -20,3 +20,11 @@ async def loads_base_info(app, columns, codes=None):
 
 async def se_info(app, column, category):
     return await backend.se_info(column, category)
+
+
+async def market_info(app, columns, where='ALL'):
+    if columns == ['']:
+        _columns = None
+    else:
+        _columns = columns
+    return await backend.market_info(_columns, where=where)

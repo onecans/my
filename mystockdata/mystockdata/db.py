@@ -135,7 +135,7 @@ class DfDb(Db):
         serieses = list()
         tmp = dict()
         for c in _columns:
-            if c == self.index_col:
+            if c == force_bytes(self.index_col):
                 continue
             try:
                 v = pickle.loads(
@@ -149,7 +149,6 @@ class DfDb(Db):
         if tmp:
             df = pd.DataFrame(data=tmp, index=index)
             df = self.handler_result(df)
-
             return df
         else:
             return None

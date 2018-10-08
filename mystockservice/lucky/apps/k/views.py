@@ -156,7 +156,7 @@ async def k_range(request):
 @routes.get('/k/min_counter/{code}')
 async def k_min_count(request):
     line = _build_line(request)
-    line = line.col(col='low')
+    line = line.col(col='low,shares,liquidity,bfq_low')
     line_df = await line.to_df()
 
     rst = line_df.min_count(window_size=int(request.query.get('window_size', 52*7)), resample=request.query.get('resample', '')
@@ -198,6 +198,18 @@ async def min_k(request):
     return json_response(line_df.to_dict(), paras={'line': str(line)})
 
 
+@cache(expires=60*60*12)
+@routes.get('/market_info/{start}/{end}')
+async def market_info(request):
+    col = request.query.get('col', '')
+
+    # if not col:
+    #     raise web.HTTPBadRequest('col is required')
+    df = await services.market_info(request.app, col.split(
+        ','), request.match_info['start'], request.match_info['end'], request.query.get('where', 'ALL'))
+    df.index = df.index.strftime('%Y-%m-%d')
+    return json_response(df.to_dict(), paras=dict(col=col.split(
+        ','), start=request.match_info['start'], end=request.match_info['end'], where=request.query.get('where', 'ALL')))
 # @cache(expires=60*60*12)
 # @routes.get('/k/line/{start}/{end}/{code}')
 # async def line(request):

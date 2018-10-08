@@ -81,6 +81,18 @@ def k_sync(code, force):
 
 
 @sync.command()
+def caculate():
+    from mystockdata.market import caculate
+    caculate()
+
+
+@sync.command()
+def show_marketdb():
+    from mystockdata.market import MarketDb
+    print(MarketDb.all().read()[['is_min', 'avg_close']])
+
+
+@sync.command()
 def sync_all():
 
     # _code_base_sync()

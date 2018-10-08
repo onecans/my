@@ -106,7 +106,7 @@ class Line:
         return self
 
     def __str__(self):
-        return '{self.code}:{self.cols}@[{self.start}-{self.end}]/{self.app}.format(**locals())'
+        return '{self.code}:{self.cols}@[{self.start}-{self.end}]/{self.app}'.format(**locals())
 
     # @cache_df(expires=12*60*60)
     async def _to_df(self, app=None):
@@ -227,6 +227,7 @@ class LineDf:
             .assign(is_rolling_min=self.df[col] == self.df['rolling_min'])
 
         counters = {}
+        dates = []
         for _col in ['is_rolling_min', 'ismin', ]:
             tmp = self.df[[_col]]
             if resample:
@@ -235,9 +236,17 @@ class LineDf:
 
             tmp = tmp[tmp.sum(axis=1) > 0]
             tmp.index = tmp.index.strftime('%Y-%m-%d')
+            dates.extend([d for d in tmp.index])
             c = Counter()
             c.update(**tmp.to_dict()[_col])
             counters[_col] = c
+
+        tmp = self.df[self.df.index.isin(dates)]
+        tmp = tmp.assign(shares_amount=tmp['shares'] * tmp['bfq_low'],
+                         liquidity_amount=tmp['liquidity'] * tmp['bfq_low'])
+        tmp.index = tmp.index.strftime('%Y-%m-%d')
+        for _col in ['shares', 'liquidity', 'shares_amount', 'liquidity_amount']:
+            counters[_col] = tmp[[_col]].to_dict()[_col]
 
         return counters
 

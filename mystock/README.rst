@@ -1,6 +1,18 @@
 mystock
 =======
 
+
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=1990-12-19&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=1991-05-17&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=1992-11-20&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=1994-07-29&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=1994-08-01&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=1999-05-18&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=2005-07-19&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=2008-10-28&final__exact=1&o=2.3
+http://127.0.0.1:8000/admin/datareader/periodmincnt/?q=2014-07-21&final__exact=1&o=2.3
+
+
 My Stock
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg

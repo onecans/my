@@ -9,7 +9,7 @@ from .models import *
 
 @admin.register(PeriodMinCnt)
 class PeriodMinCntAdmin(admin.ModelAdmin):
-    list_display = ('where', 'get_period',
+    list_display = ('where', 'period_start', 'period_end',
                     # 'profit',
                     'min_cnt',
                     #  'market_size',
@@ -19,11 +19,14 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
                     'end_market_size',
                     'end_profit',
                     'profit_without_new',
-                    'period_end', 'new_cnt', 'old_low_cnt'
+                    'new_cnt', 'old_low_cnt',
+                    'profit_shares',
+                    'profit_liquidity',
+                    'final'
 
                     )
-
-    list_filter = ('where',)
+    list_editable = ('final',)
+    list_filter = ('where', 'final')
     search_fields = ('period_start',)
     actions = ['fetch', 'compare_codes', 'copy']
     actions_on_top = True
@@ -35,14 +38,6 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
     def fetch(self, request, qs):
         for o in qs:
             o.fetch()
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs
-        return qs.filter(period_start__in=('1990-12-19', '2002-01-22',
-                                           '2016-01-27', '2001-06-14', '2014-07-21', '2007-10-16', '1999-06-30', '1997-05-12', '1994-09-13', '1999-05-18', '2005-06-03',
-                                           '1993-02-16', '2004-04-09', '2009-08-06', '2001-06-14', '2018-01-29', '1994-08-01', '1996-01-19', '2005-07-11',
-                                           '2015-06-15', '1992-05-26', '1992-11-17', '2005-07-19', '2008-11-04', '2009-08-05', '1994-7-29')).order_by('period_start', 'period_end')
 
     def copy(self, request, qs):
         for obj in qs:
@@ -186,3 +181,106 @@ class MarketDateAnalyseAdmin(admin.ModelAdmin):
         x = self.get_sum(obj)
         if x:
             return round(obj.cnt/x, 2)
+
+
+@admin.register(MarketInfo)
+class MarketInfoAdmin(admin.ModelAdmin):
+    list_display = ('date', 'is_min',
+                    # 'is_max', 'up_profit',
+                    'market_size', 'min_liquidity_profit', 'min_shares_profit',
+                    # 'max_liquidity_profit', 'max_shares_profit',
+                    # 'avg_close'
+                    )
+    list_filter = ()
+    search_fields = ()
+
+    actions = ['refresh']
+
+    list_per_page = 1000
+
+    def refresh(self, request, qs):
+        MarketInfo.objects.refresh()
+
+
+@admin.register(PeriodMinCnt2)
+class PeriodMinCnt2Admin(admin.ModelAdmin):
+    list_display = ('period_start', 'period', 'period_end',
+                    # 'profit',
+                    'min_cnt',
+                    #  'market_size',
+                    # 'get_codes',
+                    # 'test',
+                    'start_market_size',
+                    'end_market_size',
+                    'end_profit',
+                    'profit_without_new',
+                    'new_cnt', 'old_low_cnt',
+                    'profit_shares',
+                    'profit_liquidity',
+                    'profit_shares2',
+                    'profit_liquidity2',
+                    'final',
+                    'point_flag'
+
+                    )
+    list_editable = ('final', 'point_flag')
+    list_filter = ('where', 'final', 'point_flag')
+    search_fields = ('min_period_start', 'min_period_end')
+    actions = ['fetch', 'compare_codes', 'copy']
+    actions_on_top = True
+    list_per_page = 1000
+
+    def get_codes(self, obj):
+        return obj.codes.split(',') if obj.codes else []
+
+    def get_url(self):
+        return '/code_info/start/end/{code}?col=low,shares,liquidity,bfq_low'
+
+    def fetch(self, request, qs):
+        fetch = AioHttpFetch()
+        rsts = fetch.x_fetch(self.get_url(), test=False, where='ALL')
+        market_size = fetch.x_get_marketsize(where='ALL')
+        dfs = {}
+        for rst in rsts:
+            dfs[rst['paras']['line'].split(':')[0]] = pd.DataFrame.from_dict(rst['result'])
+
+        for o in qs:
+            print(o.period_start, o.period_end)
+            o.fetch(dfs, market_size)
+
+    def copy(self, request, qs):
+        for obj in qs:
+            PeriodMinCnt2(where=obj.where, period_start=obj.period_start, period_end=obj.period_end).save()
+
+    def get_period(self, obj):
+        s, e = obj.period
+        if s == e:
+            return s
+        else:
+            return obj.period
+
+    get_period.short_description = '期间'
+
+    def compare_codes(self, request, qs):
+        if len(qs) != 2:
+            messages.error(request, '必须选择两个值')
+            return
+
+        o, t = qs[0], qs[1]
+
+        if o.where != t.where:
+            messages.error(request, 'where 必须相等')
+        o_codes = o.codes.split(',')
+        t_codes = t.codes.split(',')
+        tmp = [c for c in o_codes if c not in t_codes]
+        messages.info(request, '%s 破新低数量：%s, 其中未在%s破新低数量: %s, 占比: %s, codes: %s' % (self.get_period(o), o.min_cnt,
+                                                                                    self.get_period(t), len(tmp), round(len(tmp)/o.min_cnt, 2), tmp))
+
+        tmp = [c for c in t_codes if c not in o_codes]
+        messages.info(request, '%s 破新低数量: %s, 其中未在%s破新低数量: %s, 占比: %s, codes: %s' % (self.get_period(
+            t), t.min_cnt, self.get_period(o),  len(tmp), round(len(tmp)/o.min_cnt, 2), tmp))
+
+        tmp = [c for c in t_codes if c in o_codes]
+        messages.info(request, '同时破新低的股票数量：%s, codes: %s' % (len(tmp), tmp))
+
+    # def show(self, request, qs):

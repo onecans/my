@@ -81,7 +81,7 @@ class BaseInfoDb(db.PrefixedDfDb):
         elif where == 'SH':
             tmp = df[df['sse'] == 'sh'].index
         elif where == 'SZ':
-            tmp = df[df['sse'] == 'sh'].index
+            tmp = df[df['sse'] == 'sz'].index
         else:
             raise ValueError('where can only be ALL, SH, SZ')
         return tmp.tolist()

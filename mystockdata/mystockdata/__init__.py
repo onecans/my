@@ -1,4 +1,5 @@
 from .code_base import BaseInfoDb, CodeDb
+from .market import MarketDb
 from .se import SE
 
 
@@ -34,4 +35,9 @@ def code_list(where='ALL'):
     return db.stock_list(where=where)
 
 
-__all__ = ['base_info', 'code_info', 'se_info', 'code_list']
+def market_info(columns, where='ALL'):
+    db = MarketDb(where)
+    return db.read(columns=columns)
+
+
+__all__ = ['base_info', 'code_info', 'se_info', 'code_list', 'market_info']

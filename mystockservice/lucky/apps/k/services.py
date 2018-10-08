@@ -182,6 +182,15 @@ async def se_info(app, column, category=None):
     df.index = df.index.strftime('%Y-%m-%d')
     return df.to_dict()
 
+
+async def market_info(app, columns, start, end, where='ALL'):
+    df = await backends.market_info(app, columns, where)
+    if start and start != 'start':
+        df = df[df.index >= start]
+    if end and end != 'end':
+        df = df[df.index <= end]
+    return round(df, 6)
+
 # async def k_min_max_counter(paras):
 #     window_size = int(paras.query.get('window_size', 52*7))
 #     resample = paras.query.get('resample', '')

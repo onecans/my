@@ -38,3 +38,7 @@ async def code_info(code, columns=None):
 
 async def se_info(column, category):
     return mystockdata.se_info(column, category)
+
+
+async def market_info(columns, where='ALL'):
+    return mystockdata.market_info(columns, where=where)

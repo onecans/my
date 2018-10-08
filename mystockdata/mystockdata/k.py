@@ -22,19 +22,21 @@ def sync_code(code, force=False):
     k_file_path = pathlib.Path(QFQ_FILE_PATH)
     bfq_k_file_path = pathlib.Path(BFQ_FILE_PATH)
     in_sh = in_sz = False
+    file_name = ''
     if (k_file_path / 'SH#{code}.txt'.format(code=code)).exists():
         file_name = 'SH#{code}.txt'.format(code=code)
         in_sh = True
-    elif (k_file_path / 'SZ#{code}.txt'.format(code=code)).exists():
+    if (k_file_path / 'SZ#{code}.txt'.format(code=code)).exists():
         file_name = 'SZ#{code}.txt'.format(code=code)
         in_sz = True
-    else:
+
+    if not file_name:
         print('{code}: not found file'.format(code=code))
         return
 
     if in_sh and in_sz:
         print('code, {code} error, 存在于两个市场'.format(code=code))
-
+    print(k_file_path/file_name)
     tmp = pd.read_csv(k_file_path/file_name, skiprows=1, engine='python',
                       encoding='gbk', sep='\t', skipfooter=1)
     # if index:
@@ -68,5 +70,11 @@ def sync_code(code, force=False):
         bfq = bfq.reindex(dates, method='ffill')
 
         tmp = pd.concat([tmp, bfq], axis=1, join='inner')
+
+    tmp = tmp.assign(cummin=tmp['low'].cummin()).\
+        assign(cummax=tmp['high'].cummax())
+    tmp = tmp.assign(is_min=(tmp['cummin'] == tmp['low']) * 1).\
+        assign(is_max=(tmp['cummax'] == tmp['high']) * 1).\
+        drop(['cummin', 'cummax'], axis=1)
 
     codedb.save(tmp)

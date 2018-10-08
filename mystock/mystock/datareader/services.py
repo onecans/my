@@ -68,6 +68,11 @@ class AioHttpFetch():
     def __init__(self, *args, **kwargs):
         self.stock_server = get_server()
 
+    def get(self, url):
+        _url = self.stock_server + url
+        print(_url)
+        return requests.get(_url).json()
+
     async def do_fetch(self, session, url):
         async with async_timeout.timeout(1000):
             async with session.get(url) as response:
