@@ -34,7 +34,6 @@ def download_code(code, from_tdx=False):
     else:
         xdxr = _pytdx.QA_fetch_get_stock_xdxr(code)
         if xdxr is not None:
-            error_codes.append(code)
             xdxr.to_csv(_path)
     if xdxr is None:
         return 'No data found'
