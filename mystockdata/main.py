@@ -80,14 +80,18 @@ def k_sync(code, force):
     _k_sync(code, force)
 
 
-@sync.command()
-def caculate():
+def _market_caculate():
     from mystockdata.market import caculate
     caculate()
 
 
 @sync.command()
-def show_marketdb():
+def market_caculate():
+    _market_caculate()
+
+
+@sync.command()
+def market_show():
     from mystockdata.market import MarketDb
     print(MarketDb.all().read()[['is_min', 'avg_close']])
 
@@ -97,11 +101,13 @@ def sync_all():
 
     # _code_base_sync()
     print('同步交易所当天数据')
-    _se_sync()
+    # _se_sync()
     print('同步k线数据')
-    _k_sync(code=None, force=True)
+    # _k_sync(code=None, force=True)
     print('同步股份数据，用于计算市值')
     _xdxr_sync(code=None, from_tdx=None)
+    print('计算市值')
+    _market_caculate()
 
 
 @click.group()

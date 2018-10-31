@@ -539,3 +539,79 @@ class PeriodMinCnt2(models.Model):
         self.market_liquidity_amount = marketinfo.low_liquidity_amount
         self.market_shares_amount = marketinfo.low_shares_amount
         self.save()
+
+
+class ChgSetup(models.Model):
+    start = models.DateField(blank=True, null=True,verbose_name='跌幅计算开始日期')
+    end = models.DateField(blank=True, null=True, verbose_name='跌幅计算截止日期')
+    step = models.FloatField(default=1.0, verbose_name='倍数步幅')
+
+    class Meta:
+        verbose_name = '涨跌幅设定'
+
+    def __str__(self):
+        return '[%s ~ %s] %s' % (self.start, self.end, self.step)
+
+    def get_url(self):
+        return '/code_info/start/end/{code}?col=low,high'
+
+
+    def fetch(self, data=None):
+        dfs = {}
+        if data:
+            dfs = data 
+        else:
+            fetch = AioHttpFetch()
+            rsts = fetch.x_fetch(self.get_url(), test=self.test, where=self.where)
+            for rst in rsts:
+                dfs[rst['paras']['line'].split(':')[0]] = pd.DataFrame.from_dict(rst['result'])
+        updd = defaultdict(list)
+        falldd = defaultdict(list)
+        chg_range = np.arange(0,10000,self.step)
+        for code, df in dfs.items():
+            df = df[(df.index >= self.start.strftime('%Y-%m-%d'))&(df.index <= self.end.strftime('%Y-%m-%d'))] 
+            if df.empty:
+                continue
+            change = max(df.high) / min(df.low)
+            high_idx = df.high.idxmax()
+            low_idx = df.low.idxmin()
+            if high_idx > low_idx:
+                dd = updd
+            else:
+                dd = falldd
+                #涨
+            i = 0
+            j = 1
+            while True:
+                if chg_range[i] < change <= chg_range[j]:
+                    dd[(chg_range[i],chg_range[j])].append(code)
+                    break
+                i += 1
+                j += 1
+        objs = []
+        for chg_range, codes in updd.items():
+            detail = ChgDetail(setup=self, fall=False, fall_range_start=chg_range[0], fall_range_end=chg_range[1],
+            codes = ','.join(codes))
+            objs.append(detail)
+        
+        for chg_range, codes in falldd.items():
+            detail = ChgDetail(setup=self, fall=True, fall_range_start=chg_range[0], fall_range_end=chg_range[1],
+            codes = ','.join(codes))
+            objs.append(detail)
+        ChgDetail.objects.filter(setup=self).delete()
+        if objs:
+            ChgDetail.objects.bulk_create(objs)
+
+         
+            
+
+class ChgDetail(models.Model):
+    setup = models.ForeignKey(ChgSetup, verbose_name='期间设定')
+    fall = models.BooleanField(verbose_name='跌幅？')
+    fall_range_start = models.FloatField(verbose_name='区间开始')
+    fall_range_end = models.FloatField(verbose_name='区间结束')
+    codes = models.TextField(blank=True, null=True)
+
+
+    class Meta:
+        verbose_name = '涨跌幅明细'

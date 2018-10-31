@@ -25,12 +25,14 @@ class PeriodMinCntAdmin(admin.ModelAdmin):
                     'final'
 
                     )
-    list_editable = ('final',)
+    list_editable = ('final',
+                     #  'period_end'
+                     )
     list_filter = ('where', 'final')
     search_fields = ('period_start',)
     actions = ['fetch', 'compare_codes', 'copy']
     actions_on_top = True
-    list_per_page = 1000
+    list_per_page = 100
 
     def get_codes(self, obj):
         return obj.codes.split(',') if obj.codes else []
@@ -225,7 +227,7 @@ class PeriodMinCnt2Admin(admin.ModelAdmin):
                     )
     list_editable = ('final', 'point_flag')
     list_filter = ('where', 'final', 'point_flag')
-    search_fields = ('min_period_start', 'min_period_end')
+    search_fields = ('period_start',)
     actions = ['fetch', 'compare_codes', 'copy']
     actions_on_top = True
     list_per_page = 1000
@@ -284,3 +286,35 @@ class PeriodMinCnt2Admin(admin.ModelAdmin):
         messages.info(request, '同时破新低的股票数量：%s, codes: %s' % (len(tmp), tmp))
 
     # def show(self, request, qs):
+
+
+@admin.register(ChgSetup)
+class ChgSetupAdmin(admin.ModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+    search_fields = ()
+
+    actions = ['fetch']
+
+    def get_url(self):
+        return '/code_info/start/end/{code}?col=low,high'
+
+    def fetch(self, request, qs):
+        fetch = AioHttpFetch()
+        rsts = fetch.x_fetch(self.get_url(), test=False, where='ALL')
+        dfs = {}
+        for rst in rsts:
+            dfs[rst['paras']['line'].split(':')[0]] = pd.DataFrame.from_dict(rst['result'])
+
+        for o in qs:
+            o.fetch(dfs)
+
+
+@admin.register(ChgDetail)
+class ChgDetailAdmin(admin.ModelAdmin):
+    list_display = ('setup', 'fall', 'fall_range_start', 'fall_range_end', 'get_codes')
+    list_filter = ('setup', 'fall')
+    search_fields = ()
+
+    def get_codes(self, obj):
+        return obj.codes.split(',') if obj.codes else []

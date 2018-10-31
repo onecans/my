@@ -36,7 +36,6 @@ def sync_code(code, force=False):
 
     if in_sh and in_sz:
         print('code, {code} error, 存在于两个市场'.format(code=code))
-    print(k_file_path/file_name)
     tmp = pd.read_csv(k_file_path/file_name, skiprows=1, engine='python',
                       encoding='gbk', sep='\t', skipfooter=1)
     # if index:
