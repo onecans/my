@@ -15,6 +15,7 @@ import requests
 from django.db import models
 from django.utils import timezone
 
+from ._models.fall import PriceFallDetail, PriceFallSetup
 from .services import AioHttpFetch
 
 # Create your models here.

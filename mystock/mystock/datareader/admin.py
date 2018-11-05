@@ -318,3 +318,40 @@ class ChgDetailAdmin(admin.ModelAdmin):
 
     def get_codes(self, obj):
         return obj.codes.split(',') if obj.codes else []
+
+
+@admin.register(PriceFallDetail)
+class PriceFallDetailAdmin(admin.ModelAdmin):
+    list_display = ('setup',  'fall_range_start', 'fall_range_end', 'profit', 'get_codes')
+    list_filter = ()
+    search_fields = ()
+
+    def get_codes(self, obj):
+        return obj.codes.split(',') if obj.codes else []
+
+
+@admin.register(PriceFallSetup)
+class PriceFallSetupAdmin(admin.ModelAdmin):
+    list_display = ('__str__',)
+    list_filter = ()
+    search_fields = ()
+
+    actions = ['fetch']
+
+    def get_url(self):
+        return '/code_info/start/end/{code}?col=low,high'
+
+    def fetch(self, request, qs):
+        fetch = AioHttpFetch()
+        rsts = fetch.x_fetch(self.get_url(), test=False, where='ALL')
+        dfs = {}
+        for rst in rsts:
+            dfs[rst['paras']['line'].split(':')[0]] = pd.DataFrame.from_dict(rst['result'])
+
+        market_size = fetch.x_get_marketsize(where='ALL')
+
+        market_size = pd.DataFrame.from_dict(market_size)
+        market_size.index = pd.DatetimeIndex(market_size.index)
+
+        for o in qs:
+            o.fetch(dfs, market_size)
